@@ -376,22 +376,9 @@ section.info-section {
 .foot-icon {
     width: 32px;
     height: 64px;
-    background: var(--text-muted);
-    border-radius: 16px 16px 8px 8px;
-    position: relative;
+    fill: var(--text-muted);
     opacity: 0.4;
     transition: var(--transition);
-}
-.foot-icon::after {
-    content: '';
-    position: absolute;
-    top: -5px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 24px;
-    height: 12px;
-    background: inherit;
-    border-radius: 50%;
 }
 
 .foot-left { transform: rotate(-5deg); }
@@ -657,21 +644,9 @@ input:checked + .slider-toggle:before {
 .game-dancer-feet .foot {
     width: 36px;
     height: 72px;
-    background: var(--accent);
-    border-radius: 18px 18px 9px 9px;
-    position: relative;
-    box-shadow: 0 0 15px var(--accent-glow);
-    transition: background 0.2s;
-}
-
-.game-dancer-feet .foot::after {
-    content: '';
-    position: absolute;
-    top: -6px; left: 50%;
-    transform: translateX(-50%);
-    width: 26px; height: 14px;
-    background: inherit;
-    border-radius: 50%;
+    fill: var(--accent);
+    filter: drop-shadow(0 0 8px var(--accent-glow));
+    transition: fill 0.2s, filter 0.2s;
 }
 
 .game-dancer-feet.outside {
@@ -683,8 +658,8 @@ input:checked + .slider-toggle:before {
 
 /* Dancer hit state visual */
 .game-viewport.hit .game-dancer-feet .foot {
-    background: #e74c3c;
-    box-shadow: 0 0 20px rgba(231, 76, 60, 0.8);
+    fill: #e74c3c;
+    filter: drop-shadow(0 0 10px rgba(231, 76, 60, 0.8));
     animation: shake 0.1s linear infinite;
 }
 
