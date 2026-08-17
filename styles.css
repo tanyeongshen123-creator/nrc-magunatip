@@ -430,6 +430,7 @@ section.info-section {
     border-radius: 3px;
     outline: none;
     -webkit-appearance: none;
+    appearance: none;
 }
 .game-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -1993,7 +1994,8 @@ footer {
     }
     
     .chatbot-header {
-        border-top-radius: 0;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
     }
 }
 
