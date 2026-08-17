@@ -864,7 +864,7 @@ function startGestureControl() {
     if (!gestureTracker) {
         // Initialize MediaPipe Hands
         gestureTracker = new Hands({
-            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+            locateFile: (file) => `/mediapipe/${file}`
         });
 
         gestureTracker.setOptions({
