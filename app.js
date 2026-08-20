@@ -19,7 +19,7 @@ let scheduledBeats = [];
 let gameState = 'START_SCREEN'; // START_SCREEN, PLAYING, GAME_OVER
 let score = 0;
 let lives = 3;
-let dancerPosition = 'outside'; // inside, outside
+let dancerPosition = 'center'; // left, center, right
 let collisionOccurredThisBeat = false;
 
 // Hand Gesture Tracking state variables
@@ -141,17 +141,33 @@ window.addEventListener('DOMContentLoaded', () => {
 
         if (gestureActive) return; // Disable keyboard controls if gesture control is active
 
-        if (e.code === 'Space' || e.code === 'ArrowLeft' || e.code === 'ArrowRight') {
+        if (e.code === 'ArrowLeft') {
             e.preventDefault();
-            toggleDancerPosition();
+            setDancerPosition('left');
+        } else if (e.code === 'ArrowRight') {
+            e.preventDefault();
+            setDancerPosition('right');
+        } else if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'ArrowDown') {
+            e.preventDefault();
+            setDancerPosition('center');
         }
     });
 
     // Click/Touch on Viewport to toggle position
     gameViewport.addEventListener('mousedown', (e) => {
         if (gestureActive) return; // Disable click controls if gesture control is active
-        if (gameState === 'PLAYING') {
-            toggleDancerPosition();
+        if (gameState !== 'PLAYING') return;
+
+        const rect = gameViewport.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const width = rect.width;
+
+        if (clickX < width * 0.35) {
+            setDancerPosition('left');
+        } else if (clickX > width * 0.65) {
+            setDancerPosition('right');
+        } else {
+            setDancerPosition('center');
         }
     });
 
@@ -318,12 +334,12 @@ function startGame() {
     gameState = 'PLAYING';
     score = 0;
     lives = 3;
-    dancerPosition = 'outside';
+    dancerPosition = 'center';
     collisionOccurredThisBeat = false;
 
     scoreVal.textContent = score;
     livesVal.textContent = '❤️'.repeat(lives);
-    feetElement.className = 'game-dancer-feet outside';
+    feetElement.className = 'game-dancer-feet center';
     overlayElement.style.display = 'none';
 
     isPlaying = true;
@@ -355,12 +371,10 @@ function stopGame(isWin = false) {
 function toggleDancerPosition() {
     if (gameState !== 'PLAYING') return;
 
-    if (dancerPosition === 'outside') {
-        dancerPosition = 'inside';
-        feetElement.className = 'game-dancer-feet inside';
+    if (dancerPosition === 'center') {
+        setDancerPosition('left');
     } else {
-        dancerPosition = 'outside';
-        feetElement.className = 'game-dancer-feet outside';
+        setDancerPosition('center');
     }
 }
 
@@ -469,15 +483,15 @@ function triggerVisualBeat(beat) {
     // Collision detection & scoring evaluation logic
     if (gameState === 'PLAYING') {
         if (beat === 1) {
-            // Open state: dancer should be INSIDE the poles
-            if (dancerPosition === 'inside') {
+            // Open state: dancer should be CENTER (inside)
+            if (dancerPosition === 'center') {
                 score += 10;
                 scoreVal.textContent = score;
                 playScoreChime();
             }
         } else {
-            // Closed state (beat 2 or 3): dancer should be OUTSIDE the poles
-            if (dancerPosition === 'inside') {
+            // Closed state (beat 2 or 3): dancer should be LEFT or RIGHT (outside)
+            if (dancerPosition === 'center') {
                 // Caught! Deduct life
                 lives--;
                 livesVal.textContent = '❤️'.repeat(lives);
@@ -498,8 +512,6 @@ function triggerVisualBeat(beat) {
                 scoreVal.textContent = score;
             }
         }
-
-
     }
 }
 
@@ -957,9 +969,11 @@ function onGestureResults(results) {
         }
     }
 
-    // Clear and draw video frame
+    // Clear and draw video frame (mirrored visually for natural interface)
     gestureCanvasCtx.save();
     gestureCanvasCtx.clearRect(0, 0, gestureCanvasElement.width, gestureCanvasElement.height);
+    gestureCanvasCtx.translate(gestureCanvasElement.width, 0);
+    gestureCanvasCtx.scale(-1, 1);
     gestureCanvasCtx.drawImage(results.image, 0, 0, gestureCanvasElement.width, gestureCanvasElement.height);
 
     let gestureText = 'NO HAND DETECTED';
@@ -968,36 +982,44 @@ function onGestureResults(results) {
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
         const landmarks = results.multiHandLandmarks[0];
 
-        // Draw custom skeleton lines and dots
+        // Draw custom skeleton lines and dots (will also be mirrored automatically)
         drawHandSkeleton(gestureCanvasCtx, landmarks, gestureCanvasElement.width, gestureCanvasElement.height);
 
-        // Count extended fingers
-        // Tips: Index (8), Middle (12), Ring (16), Pinky (20)
-        // Joints: Index (6), Middle (10), Ring (14), Pinky (18)
-        let extendedFingers = 0;
-        if (landmarks[8].y < landmarks[6].y) extendedFingers++;
-        if (landmarks[12].y < landmarks[10].y) extendedFingers++;
-        if (landmarks[16].y < landmarks[14].y) extendedFingers++;
-        if (landmarks[20].y < landmarks[18].y) extendedFingers++;
-        // Thumb (checking relative height)
-        if (landmarks[4].y < landmarks[2].y) extendedFingers++;
+        // Vector from Index Knuckle (5) to Index Tip (8)
+        const diffX = landmarks[8].x - landmarks[5].x;
+        const diffY = landmarks[8].y - landmarks[5].y;
+        const indexDist = Math.sqrt(diffX * diffX + diffY * diffY);
 
-        // Classify Gesture
-        if (extendedFingers >= 3) {
-            gestureText = '🖐️ OPEN PALM (IN)';
-            gestureClass = 'gesture-indicator detected-inside';
-            if (gameState === 'PLAYING') {
-                setDancerPosition('inside');
-            }
-        } else if (extendedFingers <= 1) {
-            gestureText = '✊ CLOSED FIST (OUT)';
-            gestureClass = 'gesture-indicator detected-outside';
-            if (gameState === 'PLAYING') {
-                setDancerPosition('outside');
+        const isPointing = indexDist > 0.06; // Index finger is extended
+
+        if (isPointing && Math.abs(diffX) > Math.abs(diffY) * 1.1) {
+            // Swapped mapping to match physical hand directions with the mirrored canvas view
+            if (diffX < -0.03) {
+                gestureText = '👉 POINT RIGHT (RIGHT)';
+                gestureClass = 'gesture-indicator detected-outside';
+                if (gameState === 'PLAYING') {
+                    setDancerPosition('right');
+                }
+            } else if (diffX > 0.03) {
+                gestureText = '👈 POINT LEFT (LEFT)';
+                gestureClass = 'gesture-indicator detected-outside';
+                if (gameState === 'PLAYING') {
+                    setDancerPosition('left');
+                }
+            } else {
+                gestureText = '👇 CENTER (INSIDE)';
+                gestureClass = 'gesture-indicator detected-inside';
+                if (gameState === 'PLAYING') {
+                    setDancerPosition('center');
+                }
             }
         } else {
-            gestureText = '✋ TRANSITION';
-            gestureClass = 'gesture-indicator';
+            // Open palm or fist or pointing up/down -> CENTER
+            gestureText = '👇 CENTER (INSIDE)';
+            gestureClass = 'gesture-indicator detected-inside';
+            if (gameState === 'PLAYING') {
+                setDancerPosition('center');
+            }
         }
     }
 
