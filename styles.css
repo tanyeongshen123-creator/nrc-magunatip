@@ -650,11 +650,22 @@ input:checked + .slider-toggle:before {
     transition: fill 0.2s, filter 0.2s;
 }
 
-.game-dancer-feet.outside {
+.game-dancer-feet.left {
     transform: translateX(-120px); /* Stepped out left */
 }
-.game-dancer-feet.inside {
+.game-dancer-feet.center {
     transform: translateX(0); /* Stepped in middle */
+}
+.game-dancer-feet.right {
+    transform: translateX(120px); /* Stepped out right */
+}
+
+/* Fallback legacy compatibility classes */
+.game-dancer-feet.outside {
+    transform: translateX(-120px);
+}
+.game-dancer-feet.inside {
+    transform: translateX(0);
 }
 
 /* Dancer hit state visual */
