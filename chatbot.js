@@ -26,13 +26,17 @@ Be polite, engaging, and rich with cultural details. If asked about programming,
 
 Here is the key context to base your answers on:
 - Magunatip is a traditional Sabahan bamboo dance. "atip" means "to pinch" in Murut. Dancers leap between opening/closing bamboo poles.
-- Historically, it welcomed victorious Murut warriors, served in spirit healing rituals, and warded off evil spirits. Today, it is cultural pride.
+- Historically, it welcomed victorious Murut warriors, served in spirit healing rituals, and warded off evil spirits (Rogh) led by high priestesses (Babalian). Today, it is cultural pride.
 - Steps: Beat 1 is OPEN (poles apart, tap floor; step left foot INSIDE). Beat 2 & 3 are CLOSED (poles clack together; step right foot INSIDE then leap OUTSIDE).
-- Attire: Women wear Limpur (hand-beaded black dress). Men wear Kupuo (bark vest) and Pinongkol (feathered headgear). Danced barefoot.
-- Music/Instruments: clashing bamboo poles (9-12 ft), Sansaring (small gongs), and Jarang (drums).
+- Attire: Women wear Pinongkolo or Limpur (hand-beaded black dress) decorated with geometric beadwork patterns called Rarik and silver coin belts called Pipirot. They wear the Sugu Tinggi headpiece adorned with tail feathers of the Great Argus Pheasant (Burung Kuang). Men wear the Babaru Puot (bark vest) and Pinongkol (feathered headgear). Dancers perform completely barefoot.
+- Music/Instruments: clashing bamboo poles of the Buluh Tering species (9-12 ft), Sansaring (small gongs), and Jarang (drums).
+- Simulator: Playable in the browser. Controls are strictly restricted to webcam hand gestures (pointing left, right, or down) to change positions. Keyboard arrow/click movements are disabled. Hand tracking starts automatically when "Start Dancing" is clicked.
+- Avatar Studio: A standalone section above the game. Style your dancer (clothing, hair, eyes, headwear, prop weapons) and see a live preview canvas that shows a breathing idle animation. The game uses this customized avatar directly.
+- Global Comparisons:
+  * Tinikling (Philippines): Graceful Visayan dance imitating the tikling bird escaping traps, accompanied by Rondalla guitars at 120 BPM.
+  * Cheraw Dance (Mizoram, India): Grid of horizontal and vertical poles clacked to gongs and drums at 90 BPM.
 - ESP32 Hardware: Pin 23 drives the LED dimmer, Pin 4 & 18 control NeoPixels, Pin 14 (Trig) & 27 (Echo) interface the HC-SR04 ultrasonic distance sensor, I2C SDA is Pin 21 and SCL is Pin 22.
-- ESP32 Protocols: Supports HTTP REST GET/POST (endpoint: /led?mode=FAST|SLOW|MEDIUM), WebSockets (port 81), and Web Serial (USB cable, 115200 baud).
-- Simulator: Playable in the browser. Space or Arrow keys to jump. Slow speed (110 BPM), Medium (130 BPM), Fast (160 BPM). Match the ESP32 mode.`;
+- ESP32 Protocols: Supports HTTP REST GET/POST (endpoint: /led?mode=FAST|SLOW|MEDIUM), WebSockets (port 81), and Web Serial (USB cable, 115200 baud).`;
 
     // Local QA Knowledge Base (for offline/no-API fallback)
     const localKnowledgeBase = [
@@ -41,8 +45,8 @@ Here is the key context to base your answers on:
             answer: `<strong>Magunatip</strong> is a traditional bamboo dance of the <strong>Murut people</strong>, one of the major indigenous communities in Sabah, Malaysia. The name comes from the Murut word <em>"atip"</em>, which means "to pinch". This refers to the rhythmic opening and closing of 9-to-12-foot-long bamboo poles. Dancers move gracefully between the clashing poles, requiring excellent agility, footwork, concentration, and timing.`
         },
         {
-            keywords: ['history', 'origin', 'past', 'warrior', 'headhunt', 'heal', 'spirit', 'ritual', 'beginning'],
-            answer: `Magunatip began as a playful game in paddy fields, but historically grew to be associated with <strong>welcoming victorious warriors</strong> returning from headhunting expeditions, <strong>healing rituals</strong>, and cultural celebrations. The clashing sound of the bamboo poles was believed to scare away evil spirits causing illness and bad luck.`
+            keywords: ['history', 'origin', 'past', 'warrior', 'headhunt', 'heal', 'spirit', 'ritual', 'beginning', 'rogh', 'babalian'],
+            answer: `Magunatip began as a playful game in paddy fields, but historically grew to be associated with <strong>welcoming victorious warriors</strong> returning from headhunting expeditions, <strong>healing rituals</strong>, and cultural celebrations. The clashing sound of the bamboo poles was believed to scare away evil forest spirits (<strong>Rogh</strong>), a task historically led by high priestesses (<strong>Babalian</strong>).`
         },
         {
             keywords: ['step', 'how to dance', 'how do i dance', 'beat', 'feet', 'inside', 'outside', 'open', 'close', 'clack', 'slide'],
@@ -52,16 +56,16 @@ Here is the key context to base your answers on:
             - <strong>Beat 3 (CLOSED):</strong> The poles remain closed. The dancer must leap <strong>outside</strong> the poles to the left or right to avoid getting their feet caught.`
         },
         {
-            keywords: ['attire', 'costume', 'wear', 'clothe', 'dress', 'limpur', 'kupuo', 'pinongkol', 'feather', 'bead'],
+            keywords: ['attire', 'costume', 'wear', 'clothe', 'dress', 'limpur', 'kupuo', 'pinongkol', 'feather', 'bead', 'pinongkolo', 'rarik', 'pipirot', 'sugu tinggi', 'burung kuang', 'babaru puot'],
             answer: `Dancers wear beautiful traditional Murut garments:<br>
-            - <strong>Women:</strong> Wear the <strong>Limpur</strong>, a black dress adorned with colorful, hand-crafted beadwork and embroidery.<br>
-            - <strong>Men:</strong> Wear the <strong>Kupuo</strong> (a black bark vest with red/yellow accents), a loincloth, and the <strong>Pinongkol</strong> (feathered headgear).<br>
+            - <strong>Women:</strong> Wear the <strong>Pinongkolo</strong> or <strong>Limpur</strong>, a black dress adorned with colorful, hand-crafted beadwork patterns called <strong>Rarik</strong> and silver coin belts called <strong>Pipirot</strong>. They wear the <strong>Sugu Tinggi</strong> headpiece adorned with tail feathers of the Great Argus Pheasant (<strong>Burung Kuang</strong>).<br>
+            - <strong>Men:</strong> Wear the <strong>Babaru Puot</strong> (a black bark vest with red/yellow accents), a loincloth, and the <strong>Pinongkol</strong> (feathered headgear).<br>
             Dancers perform completely barefoot to stay agile and avoid slipping on the bamboo.`
         },
         {
-            keywords: ['music', 'instrument', 'instruments', 'gong', 'gongs', 'drum', 'drums', 'sansaring', 'jarang', 'bamboo'],
+            keywords: ['music', 'instrument', 'instruments', 'gong', 'gongs', 'drum', 'drums', 'sansaring', 'jarang', 'bamboo', 'buluh tering'],
             answer: `Magunatip music is fast-paced and consists of:<br>
-            - <strong>Bamboo Clashing:</strong> The core rhythmic beat produced by striking the poles together.<br>
+            - <strong>Bamboo Clashing:</strong> The core rhythmic beat produced by striking poles of the <strong>Buluh Tering</strong> species (cured over hearth smoke) together and against floor blocks.<br>
             - <strong>Sansaring:</strong> A set of small traditional brass gongs of different pitches playing a melody.<br>
             - <strong>Jarang:</strong> A single-headed skin drum that sets the deep bass tempo.`
         },
@@ -73,18 +77,18 @@ Here is the key context to base your answers on:
             - <strong>Default IP:</strong> <code>192.168.4.1</code> in Access Point mode.`
         },
         {
-            keywords: ['simulator', 'game', 'play', 'control', 'key', 'spacebar', 'arrow', 'lives', 'score', 'bpm', 'speed'],
-            answer: `You can play the <strong>Magunatip Dance Simulator</strong> right on this website!<br>
-            - <strong>Controls:</strong> Press the <strong>Spacebar</strong>, <strong>Left Arrow</strong>, or <strong>Right Arrow</strong> keys (or click directly on the game screen) to jump inside and outside the bamboo poles.<br>
-            - <strong>Gameplay:</strong> You must be <strong>inside</strong> on Beat 1, and <strong>outside</strong> on Beats 2 and 3. You start with 3 lives. Scoring a successful step gives points, while getting caught loses a life.<br>
-            - <strong>Tempo:</strong> Adjust between <strong>Slow (110 BPM)</strong>, <strong>Medium (130 BPM)</strong>, and <strong>Fast (160 BPM)</strong>.`
+            keywords: ['simulator', 'game', 'play', 'control', 'key', 'spacebar', 'arrow', 'lives', 'score', 'bpm', 'speed', 'customizer', 'avatar', 'blindfold', 'auto', 'streak', 'camera', 'gesture', 'webcam', 'hand'],
+            answer: `You can play the premium <strong>Magunatip Dance Simulator</strong> right on this website!<br>
+            - <strong>Controls:</strong> This game is strictly controlled using <strong>camera hand gestures</strong>. Keyboard arrows and mouse clicks for movement are disabled. Point your index finger left, right, or down (inside) to dance.<br>
+            - <strong>Avatar Studio:</strong> Style your dancer in the standalone section at the top. The preview canvas displays a breathing Chibi dancer. The game directly uses this customized figure in the simulator.<br>
+            - <strong>Modes & Settings:</strong> Toggles for Footprints View vs. Chibi Avatar View, Blindfold Mode 🙈, Auto-AI Play 🤖, and Tempos. Jumping successfully builds a combo streak score.`
         },
         {
-            keywords: ['similar', 'other dance', 'tinikling', 'cheraw', 'bamboo dance', 'compare', 'philippines', 'india', 'difference'],
-            answer: `Yes, there are several traditional bamboo dances similar to Magunatip across Southeast Asia and beyond:<br>
-            - <strong>Tinikling (Philippines):</strong> The national dance of the Philippines, where dancers imitate the tikling bird stepping over bamboo traps. It shares the same basic clashing rhythm but has different attire and footwork.<br>
-            - <strong>Cheraw Dance (Mizoram, India):</strong> A traditional Indian bamboo dance performed during festivals.<br>
-            While they look similar, Magunatip is unique to the <strong>Murut people of Sabah</strong>, historically performed to welcome warriors and heal the sick.`
+            keywords: ['similar', 'other dance', 'tinikling', 'cheraw', 'bamboo dance', 'compare', 'philippines', 'india', 'difference', 'global'],
+            answer: `Yes! Magunatip belongs to a family of global bamboo-clashing dances:<br>
+            - <strong>Tinikling (Philippines):</strong> Graceful Visayan dance imitating the tikling bird escaping bamboo traps, set to a waltz tempo at 120 BPM using stringed Rondalla guitars.<br>
+            - <strong>Cheraw Dance (Mizoram, India):</strong> An ancient Mizo dance performed during harvests, where dancers leap through a vertical and horizontal grid of bamboo poles clapped at 90 BPM alongside gongs and drums.<br>
+            - <strong>Magunatip (Sabah, Malaysia):</strong> Characterized by its incredible speeds (160+ BPM), original warrior headhunting origins, and forest spirit cleansing rituals.`
         },
         {
             keywords: ['hello', 'hi', 'hey', 'greetings', 'yo'],
