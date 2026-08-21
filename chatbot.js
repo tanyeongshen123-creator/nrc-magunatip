@@ -31,7 +31,7 @@ Here is the key context to base your answers on:
 - Costumes & Props: Male dancers wear a bark vest and loincloth made from the Aputul (Artocarpus Kunstleri) tree, elaborate feathered headgear (Lalandau), and often carry a wooden shield (Kolid or Kliau) and a machete (Hayang) or spear to symbolize their warrior heritage. Female dancers wear a beautiful, heavily embroidered and beaded traditional dress called Pinongkolo, paired with a waist accessory called a Pipirot. Dancers perform barefoot.
 - Modern Day Context: Today, Magunatip is no longer associated with headhunting or pagan rituals. It is proudly preserved as a cultural heritage and is performed during major social occasions, weddings, and especially during the Kaamatan (Harvest) Festival in May. It is also a popular highlight in cultural villages and tourism shows across Sabah.
 - Simulator: Playable in the browser. Controls are strictly restricted to webcam hand gestures (pointing left, right, or down) to change positions. Keyboard arrow/click movements are disabled. Separate "Enable Camera" and "Start Dancing" buttons are used on the start overlay to avoid warmup lag.
-- ESP32 Hardware & Protocols: LED dimmer uses GPIO 23, NeoPixel strips use GPIO 4 & 18. Supports REST API HTTP /led?mode=FAST|SLOW, WebSockets (port 81), and USB Web Serial.`;
+- ESP32 Hardware & Protocols: LED dimmers use GPIO 23 and GPIO 33 (both act identically), NeoPixel strips use GPIO 4 & 2. Supports REST API HTTP /led?mode=FAST|SLOW, WebSockets (port 81), and USB Web Serial.`;
 
     // Local QA Knowledge Base (for offline/no-API fallback)
     const localKnowledgeBase = [
@@ -67,7 +67,7 @@ Here is the key context to base your answers on:
         {
             keywords: ['esp32', 'esp8266', 'led', 'hardware', 'arduino', 'firmware', 'ip', 'pin', 'wifi', 'serial', 'websocket', 'http', 'connection'],
             answer: `The project includes an <strong>ESP32/ESP8266 LED Lightbulb Bridge</strong> firmware:<br>
-            - <strong>Pins:</strong> LED dimmer uses <strong>GPIO 23</strong>; NeoPixel strips use <strong>GPIO 4 & 18</strong>; Ultrasonic Sensor uses <strong>GPIO 14 & 27</strong>.<br>
+            - <strong>Pins:</strong> LED dimmers use <strong>GPIO 23 & GPIO 33</strong> (both act identically); NeoPixel strips use <strong>GPIO 4 & 2</strong>; Ultrasonic Sensor uses <strong>GPIO 14 & 27</strong>.<br>
             - <strong>Protocols:</strong> Commands are sent via HTTP REST API (port 80 GET requests to <code>/led?mode=MODE</code>), WebSockets (port 81), or Web Serial (USB cable at 115200 baud).<br>
             - <strong>Speed presets:</strong> Toggle between <strong>Fast Mode</strong> (clashing) and <strong>Slow Mode</strong> presets.`
         },
