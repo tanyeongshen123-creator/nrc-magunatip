@@ -395,8 +395,15 @@ section.info-section {
 /* Playable Simulator Zone */
 .simulator-area {
     display: grid;
-    grid-template-columns: 1.5fr 1fr;
-    gap: 3rem;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+}
+
+@media (min-width: 992px) {
+    .simulator-area {
+        grid-template-columns: 1.5fr 1fr;
+        gap: 3rem;
+    }
 }
 
 /* metronome and interactive controller widget */
@@ -2113,4 +2120,146 @@ footer {
     color: var(--primary-light);
     border-color: var(--primary);
     box-shadow: 0 0 8px rgba(211, 84, 0, 0.3);
+}
+
+/* Customizer Panel & Avatar Styles */
+.customizer-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+.customizer-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+.customizer-row label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+}
+.customizer-select {
+    width: 100%;
+    background: rgba(18, 12, 8, 0.6);
+    border: 1px solid var(--glass-border);
+    border-radius: 0.75rem;
+    padding: 0.6rem 0.8rem;
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 0.85rem;
+    outline: none;
+    transition: var(--transition);
+}
+.customizer-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 8px rgba(211, 84, 0, 0.2);
+}
+
+/* Global comparisons styles */
+.comparisons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+.comparison-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+.comparison-card h3 {
+    font-size: 1.4rem;
+    color: var(--text-main);
+}
+.comparison-card p {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    flex-grow: 1;
+}
+.comparison-badge {
+    align-self: flex-start;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.comparison-meta {
+    display: flex;
+    gap: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding-top: 0.8rem;
+}
+.comparison-meta span {
+    font-family: monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    background: rgba(0,0,0,0.2);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+}
+.comparison-card.active-comparison {
+    border-color: var(--primary);
+    box-shadow: 0 0 15px rgba(211, 84, 0, 0.15);
+}
+
+/* Viewport stages */
+.game-stage-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Custom switch / toggles styles */
+.simulator-toggles-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+.btn-toggle-mode {
+    padding: 0.6rem;
+    border-radius: 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-family: 'Outfit', sans-serif;
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: center;
+    border: 1px solid var(--glass-border);
+    background: rgba(0,0,0,0.2);
+    color: var(--text-muted);
+}
+.btn-toggle-mode:hover {
+    border-color: var(--primary);
+    color: var(--text-main);
+}
+.btn-toggle-mode.active-mode {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    box-shadow: 0 0 10px rgba(211, 84, 0, 0.3);
+}
+
+/* Standalone Avatar Studio Section Layout */
+.avatar-studio-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    align-items: start;
+    margin-top: 2rem;
+}
+@media (min-width: 768px) {
+    .avatar-studio-layout {
+        grid-template-columns: 1fr 1.1fr;
+        gap: 3rem;
+    }
 }
