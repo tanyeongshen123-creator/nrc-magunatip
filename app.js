@@ -3,7 +3,7 @@
 let audioCtx = null;
 let isPlaying = false;
 let isMuted = false;
-let playMusicToggle = true;
+let playMusicToggle = false;
 
 // Metronome Scheduler variables
 let bpm = 110;
@@ -18,9 +18,32 @@ let scheduledBeats = [];
 // Game state variables
 let gameState = 'START_SCREEN'; // START_SCREEN, PLAYING, GAME_OVER
 let score = 0;
+let streak = 0;
+let highScore = 0;
 let lives = 3;
 let dancerPosition = 'center'; // left, center, right
 let collisionOccurredThisBeat = false;
+let polesOpen = true;
+
+// Simulator View & Game Mode variables
+let activeSimulatorView = 'avatar'; // 'feet' or 'avatar'
+let blindfoldMode = false;
+let autoAiHopMode = false;
+
+// Avatar customization state
+let avatarState = {
+    clothing: 'pinongkolo',
+    hair: 'bun',
+    hairColor: 'black',
+    eyes: 'chestnut',
+    headwear: 'sugu',
+    prop: 'none'
+};
+
+// Canvas animation variables
+let canvasDancerX = 300; // center of 600px width canvas
+let canvasDancerYOffset = 0;
+let canvasPolesTransition = 1.0; // 0 = closed, 1 = open
 
 // Hand Gesture Tracking state variables
 let gestureActive = false;
@@ -46,8 +69,11 @@ const accompaniment = [
 ];
 
 // DOM Elements
-let scoreVal, livesVal, gameViewport, feetElement, btnDanceSlow, btnDanceFast, bpmVal, musicCheckbox, muteCheckbox, overlayElement, overlayTitle, overlayText, overlayBtn;
+let scoreVal, streakVal, livesVal, gameViewport, feetElement, btnDanceSlow, btnDanceFast, bpmVal, musicCheckbox, muteCheckbox, overlayElement, overlayTitle, overlayText, overlayBtn, overlayBtnCamera;
 let indicator1, indicator2, indicator3;
+let viewToggleFeet, viewToggleAvatar, avatarCanvas, avatarCtx, customizerCanvas, customizerCtx;
+let clothingSelect, hairSelect, hairColorSelect, eyeSelect, headwearSelect, propSelect;
+let blindfoldToggle, autohopToggle;
 
 // Initialize elements once DOM loads
 window.addEventListener('DOMContentLoaded', () => {
@@ -64,6 +90,7 @@ window.addEventListener('DOMContentLoaded', () => {
     overlayTitle = document.getElementById('overlay-title');
     overlayText = document.getElementById('overlay-text');
     overlayBtn = document.getElementById('overlay-btn');
+    overlayBtnCamera = document.getElementById('overlay-btn-camera');
 
     indicator1 = document.getElementById('beat-ind-1');
     indicator2 = document.getElementById('beat-ind-2');
@@ -98,9 +125,11 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    musicCheckbox.addEventListener('change', (e) => {
-        playMusicToggle = e.target.checked;
-    });
+    if (musicCheckbox) {
+        musicCheckbox.addEventListener('change', (e) => {
+            playMusicToggle = e.target.checked;
+        });
+    }
 
     muteCheckbox.addEventListener('change', (e) => {
         isMuted = e.target.checked;
@@ -126,50 +155,119 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    if (overlayBtnCamera) {
+        overlayBtnCamera.addEventListener('click', () => {
+            startGestureControl();
+        });
+    }
+
     overlayBtn.addEventListener('click', () => {
         if (gameState === 'START_SCREEN' || gameState === 'GAME_OVER') {
             startGame();
         }
     });
 
-    // Control by Spacebar or Arrow keys
+    // Control by Spacebar shortcut for starting/restarting game overlays
     window.addEventListener('keydown', (e) => {
-        // Prevent keybinds from firing if the user is typing in form/input fields
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
             return;
         }
 
-        if (gestureActive) return; // Disable keyboard controls if gesture control is active
-
-        if (e.code === 'ArrowLeft') {
+        if (e.code === 'Space') {
             e.preventDefault();
-            setDancerPosition('left');
-        } else if (e.code === 'ArrowRight') {
-            e.preventDefault();
-            setDancerPosition('right');
-        } else if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'ArrowDown') {
-            e.preventDefault();
-            setDancerPosition('center');
+            // Trigger clicking overlay button to start/restart
+            if (overlayElement && overlayElement.style.display !== 'none') {
+                overlayBtn.click();
+            }
         }
     });
 
-    // Click/Touch on Viewport to toggle position
-    gameViewport.addEventListener('mousedown', (e) => {
-        if (gestureActive) return; // Disable click controls if gesture control is active
-        if (gameState !== 'PLAYING') return;
+    // Mouse click/touch movement controls are removed for strictly camera gesture control.
 
-        const rect = gameViewport.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        const width = rect.width;
+    // Extra elements and bindings for merged customizer and view states
+    streakVal = document.getElementById('streak-val');
+    viewToggleFeet = document.getElementById('btn-toggle-feet');
+    viewToggleAvatar = document.getElementById('btn-toggle-avatar');
+    avatarCanvas = document.getElementById('avatar-canvas');
+    if (avatarCanvas) {
+        avatarCtx = avatarCanvas.getContext('2d');
+    }
+    customizerCanvas = document.getElementById('customizer-preview-canvas');
+    if (customizerCanvas) {
+        customizerCtx = customizerCanvas.getContext('2d');
+    }
 
-        if (clickX < width * 0.35) {
-            setDancerPosition('left');
-        } else if (clickX > width * 0.65) {
-            setDancerPosition('right');
-        } else {
-            setDancerPosition('center');
-        }
-    });
+    clothingSelect = document.getElementById('clothing-select');
+    hairSelect = document.getElementById('hair-select');
+    hairColorSelect = document.getElementById('hair-color-select');
+    eyeSelect = document.getElementById('eye-select');
+    headwearSelect = document.getElementById('headwear-select');
+    propSelect = document.getElementById('prop-select');
+    
+    blindfoldToggle = document.getElementById('blindfold-toggle');
+    autohopToggle = document.getElementById('autohop-toggle');
+
+    // Binding dropdown selections to update avatar customizer state
+    if (clothingSelect) {
+        clothingSelect.addEventListener('change', (e) => { avatarState.clothing = e.target.value; });
+    }
+    if (hairSelect) {
+        hairSelect.addEventListener('change', (e) => { avatarState.hair = e.target.value; });
+    }
+    if (hairColorSelect) {
+        hairColorSelect.addEventListener('change', (e) => { avatarState.hairColor = e.target.value; });
+    }
+    if (eyeSelect) {
+        eyeSelect.addEventListener('change', (e) => { avatarState.eyes = e.target.value; });
+    }
+    if (headwearSelect) {
+        headwearSelect.addEventListener('change', (e) => { avatarState.headwear = e.target.value; });
+    }
+    if (propSelect) {
+        propSelect.addEventListener('change', (e) => { avatarState.prop = e.target.value; });
+    }
+
+    // View toggles: Footprints vs. Canvas Avatar
+    if (viewToggleFeet) {
+        viewToggleFeet.addEventListener('click', () => {
+            activeSimulatorView = 'feet';
+            viewToggleFeet.classList.add('active-mode');
+            if (viewToggleAvatar) viewToggleAvatar.classList.remove('active-mode');
+            
+            const feetStage = document.getElementById('classic-stage');
+            const avatarStage = document.getElementById('avatar-stage');
+            if (feetStage) feetStage.style.display = 'flex';
+            if (avatarStage) avatarStage.style.display = 'none';
+        });
+    }
+
+    if (viewToggleAvatar) {
+        viewToggleAvatar.addEventListener('click', () => {
+            activeSimulatorView = 'avatar';
+            viewToggleAvatar.classList.add('active-mode');
+            if (viewToggleFeet) viewToggleFeet.classList.remove('active-mode');
+            
+            const feetStage = document.getElementById('classic-stage');
+            const avatarStage = document.getElementById('avatar-stage');
+            if (feetStage) feetStage.style.display = 'none';
+            if (avatarStage) avatarStage.style.display = 'flex';
+        });
+    }
+
+    // Toggles for game modes
+    if (blindfoldToggle) {
+        blindfoldToggle.addEventListener('change', (e) => {
+            blindfoldMode = e.target.checked;
+            logTerminal(`[USER ACTION] Blindfold Mode turned ${blindfoldMode ? 'ON' : 'OFF'}`, 'info');
+        });
+    }
+
+    if (autohopToggle) {
+        autohopToggle.addEventListener('change', (e) => {
+            autoAiHopMode = e.target.checked;
+            logTerminal(`[USER ACTION] Auto-AI Hop Mode turned ${autoAiHopMode ? 'ON' : 'OFF'}`, 'info');
+        });
+    }
 
     // Start requestAnimationFrame loop
     requestAnimationFrame(animationLoop);
@@ -333,12 +431,16 @@ function startGame() {
 
     gameState = 'PLAYING';
     score = 0;
+    streak = 0;
     lives = 3;
     dancerPosition = 'center';
     collisionOccurredThisBeat = false;
+    canvasDancerX = 300;
+    canvasDancerYOffset = 0;
 
     scoreVal.textContent = score;
-    livesVal.textContent = '❤️'.repeat(lives);
+    if (streakVal) streakVal.textContent = streak;
+    livesVal.textContent = '❤️'.repeat(Math.max(0, lives));
     feetElement.className = 'game-dancer-feet center';
     overlayElement.style.display = 'none';
 
@@ -347,6 +449,11 @@ function startGame() {
     currentBeat = 1;
     currentMeasure = 0;
     scheduledBeats = [];
+
+    // Resume hand tracking when game starts
+    gestureActive = true;
+    const container = document.getElementById('gesture-webcam-container');
+    if (container) container.style.display = 'block';
 
     startScheduler();
 }
@@ -358,13 +465,25 @@ function stopGame(isWin = false) {
     gameState = 'GAME_OVER';
     overlayElement.style.display = 'flex';
 
+    // Stop webcam hand gesture tracking when game ends
+    stopGestureControl();
+
     // Reset hardware to currently selected dashboard mode
     sendEspCommand(espMode);
 
+    if (score > highScore) {
+        highScore = score;
+    }
+
     if (lives <= 0) {
         overlayTitle.textContent = 'Oops! Caught!';
-        overlayText.innerHTML = `Your feet got caught in the bamboo poles!<br><br><strong style="font-size: 1.25rem; color: var(--accent);">Final Score: ${score}</strong>`;
+        overlayText.innerHTML = `Your feet got caught in the bamboo poles!<br><br><strong style="font-size: 1.25rem; color: var(--accent);">Score: ${score} | High Score: ${highScore}</strong>`;
         overlayBtn.textContent = 'Try Again';
+        
+        // Since camera is already running in background, keep start button enabled
+        overlayBtn.removeAttribute('disabled');
+        overlayBtn.style.opacity = '1';
+        overlayBtn.style.pointerEvents = 'auto';
     }
 }
 
@@ -383,6 +502,8 @@ function setDancerPosition(position) {
     if (dancerPosition !== position) {
         dancerPosition = position;
         feetElement.className = `game-dancer-feet ${position}`;
+        // Hop trigger for 2D Chibi Canvas Dancer
+        canvasDancerYOffset = -25;
     }
 }
 
@@ -451,11 +572,31 @@ function animationLoop() {
         triggerVisualBeat(currentScheduledEvent.beat);
     }
 
+    // Render the standalone Avatar Studio preview canvas (always active)
+    renderCustomizerPreview();
+
+    // Canvas Chibi rendering loop inside gameplay simulator
+    if (activeSimulatorView === 'avatar') {
+        renderCanvasAvatar();
+    }
+
     requestAnimationFrame(animationLoop);
 }
 
 // Render beat UI updates and evaluate collision game logic
 function triggerVisualBeat(beat) {
+    polesOpen = (beat === 1);
+
+    // Auto-AI Hop Mode actions
+    if (autoAiHopMode && gameState === 'PLAYING') {
+        if (beat === 1) {
+            setDancerPosition('center');
+        } else if (beat === 2) {
+            const side = Math.random() > 0.5 ? 'left' : 'right';
+            setDancerPosition(side);
+        }
+    }
+
     // Reset indicators
     indicator1.classList.remove('active');
     indicator2.classList.remove('active');
@@ -485,16 +626,24 @@ function triggerVisualBeat(beat) {
         if (beat === 1) {
             // Open state: dancer should be CENTER (inside)
             if (dancerPosition === 'center') {
-                score += 10;
+                streak++;
+                score += 10 + Math.floor(streak / 5);
                 scoreVal.textContent = score;
+                if (streakVal) streakVal.textContent = streak;
                 playScoreChime();
+            } else {
+                // If they stayed outside during open state, no penalty but break streak
+                streak = 0;
+                if (streakVal) streakVal.textContent = streak;
             }
         } else {
             // Closed state (beat 2 or 3): dancer should be LEFT or RIGHT (outside)
             if (dancerPosition === 'center') {
-                // Caught! Deduct life
+                // Caught! Deduct life and break streak
                 lives--;
-                livesVal.textContent = '❤️'.repeat(lives);
+                streak = 0;
+                livesVal.textContent = '❤️'.repeat(Math.max(0, lives));
+                if (streakVal) streakVal.textContent = streak;
 
                 gameViewport.classList.add('hit');
                 playFailSound();
@@ -508,8 +657,10 @@ function triggerVisualBeat(beat) {
                 }
             } else {
                 // Safely outside!
-                score += 5;
+                streak++;
+                score += 5 + Math.floor(streak / 5);
                 scoreVal.textContent = score;
+                if (streakVal) streakVal.textContent = streak;
             }
         }
     }
@@ -528,7 +679,7 @@ let serialPort = null;
 let serialWriter = null;
 
 // ESP DOM Elements
-let btnFastMode, btnSlowMode, btnMediumMode;
+let btnFastMode, btnSlowMode;
 let espIpInput, espProtocolSelect, btnTestEsp;
 let terminalLog, btnClearLog, statusPill, statusText;
 let lightbulbGlow, virtualLightbulb, lightbulbStatusMode, lightbulbStatusState;
@@ -538,7 +689,6 @@ let codeModal, btnOpenCodeModal, btnCloseCodeModal, btnCopyCode;
 window.addEventListener('DOMContentLoaded', () => {
     btnFastMode = document.getElementById('btn-mode-fast');
     btnSlowMode = document.getElementById('btn-mode-slow');
-    btnMediumMode = document.getElementById('btn-mode-medium');
     espIpInput = document.getElementById('esp-ip-input');
     espProtocolSelect = document.getElementById('esp-protocol-select');
     btnTestEsp = document.getElementById('btn-test-esp');
@@ -568,13 +718,6 @@ window.addEventListener('DOMContentLoaded', () => {
     if (btnSlowMode) {
         btnSlowMode.addEventListener('click', () => {
             setEspMode('SLOW');
-        });
-    }
-
-    // Event Listener: MEDIUM Mode Button
-    if (btnMediumMode) {
-        btnMediumMode.addEventListener('click', () => {
-            setEspMode('MEDIUM');
         });
     }
 
@@ -639,12 +782,11 @@ window.addEventListener('DOMContentLoaded', () => {
     updateLightbulbVisualizer(espMode);
 });
 
-// Set Active Mode (FAST, MEDIUM or SLOW) and transmit to ESP board
+// Set Active Mode (FAST or SLOW) and transmit to ESP board
 function setEspMode(mode) {
     espMode = mode;
 
     if (btnFastMode) btnFastMode.classList.remove('active');
-    if (btnMediumMode) btnMediumMode.classList.remove('active');
     if (btnSlowMode) btnSlowMode.classList.remove('active');
 
     if (mode === 'FAST') {
@@ -658,15 +800,6 @@ function setEspMode(mode) {
             if (btnDanceSlow) btnDanceSlow.classList.remove('active-speed');
         }
         logTerminal(`[USER ACTION] Selected ⚡ FAST MODE (LED 255, Sensor Active)`, 'sent');
-    } else if (mode === 'MEDIUM') {
-        if (btnMediumMode) btnMediumMode.classList.add('active');
-
-        // Sync dance settings buttons to Medium speed (130 BPM)
-        bpm = 130;
-        if (bpmVal) bpmVal.textContent = "130 (MEDIUM)";
-        if (btnDanceSlow) btnDanceSlow.classList.remove('active-speed');
-        if (btnDanceFast) btnDanceFast.classList.remove('active-speed');
-        logTerminal(`[USER ACTION] Selected 🔆 MEDIUM MODE (LED 48, Sensor Active)`, 'sent');
     } else if (mode === 'SLOW') {
         if (btnSlowMode) btnSlowMode.classList.add('active');
 
@@ -801,12 +934,6 @@ function updateLightbulbVisualizer(mode) {
         virtualLightbulb.className = 'virtual-lightbulb mode-fast';
         if (lightbulbStatusMode) lightbulbStatusMode.textContent = 'MODE: FAST (🌈)';
         if (lightbulbStatusState) lightbulbStatusState.textContent = 'STATUS: FULL ON';
-    } else if (mode === 'MEDIUM') {
-        lightbulbGlow.style.opacity = 0.65;
-        lightbulbGlow.className = 'lightbulb-glow mode-medium-glow';
-        virtualLightbulb.className = 'virtual-lightbulb mode-medium';
-        if (lightbulbStatusMode) lightbulbStatusMode.textContent = 'MODE: MEDIUM (🔆)';
-        if (lightbulbStatusState) lightbulbStatusState.textContent = 'STATUS: DIM MED';
     } else if (mode === 'SLOW') {
         lightbulbGlow.style.opacity = 0.1;
         lightbulbGlow.className = 'lightbulb-glow mode-slow-glow';
@@ -868,6 +995,27 @@ function startGestureControl() {
     const container = document.getElementById('gesture-webcam-container');
     if (container) container.style.display = 'block';
 
+    // If camera stream is already running, avoid renegotiating device access
+    if (gestureVideoElement && gestureVideoElement.srcObject && cameraHelper) {
+        if (gestureLoadingOverlay) {
+            gestureLoadingOverlay.style.display = 'none';
+        }
+        // Enable Start button once camera is ready
+        if (overlayBtn) {
+            overlayBtn.removeAttribute('disabled');
+            overlayBtn.style.opacity = '1';
+            overlayBtn.style.pointerEvents = 'auto';
+        }
+        if (overlayBtnCamera) {
+            overlayBtnCamera.innerHTML = '✅ Camera Active';
+            overlayBtnCamera.setAttribute('disabled', 'true');
+            overlayBtnCamera.style.opacity = '0.7';
+            overlayBtnCamera.style.pointerEvents = 'none';
+        }
+        logTerminal('[GESTURE] Re-attached to active background camera stream.', 'success');
+        return;
+    }
+
     if (gestureLoadingOverlay) {
         gestureLoadingOverlay.style.display = 'flex';
         gestureLoadingOverlay.style.opacity = '1';
@@ -897,7 +1045,6 @@ function startGestureControl() {
     navigator.mediaDevices.getUserMedia(constraints)
         .then(stream => {
             if (!gestureActive) {
-                // User toggled off before camera opened
                 stream.getTracks().forEach(t => t.stop());
                 return;
             }
@@ -915,6 +1062,19 @@ function startGestureControl() {
             });
             cameraHelper.start();
             logTerminal('[GESTURE] Webcam activated and hand tracker started.', 'success');
+
+            // Enable Start button once camera is ready
+            if (overlayBtn) {
+                overlayBtn.removeAttribute('disabled');
+                overlayBtn.style.opacity = '1';
+                overlayBtn.style.pointerEvents = 'auto';
+            }
+            if (overlayBtnCamera) {
+                overlayBtnCamera.innerHTML = '✅ Camera Active';
+                overlayBtnCamera.setAttribute('disabled', 'true');
+                overlayBtnCamera.style.opacity = '0.7';
+                overlayBtnCamera.style.pointerEvents = 'none';
+            }
         })
         .catch(err => {
             console.error('Webcam access failed for gestures:', err);
@@ -933,23 +1093,15 @@ function startGestureControl() {
 
 function stopGestureControl() {
     gestureActive = false;
-    logTerminal('[GESTURE] Hand gesture control disabled.', 'info');
+    logTerminal('[GESTURE] Hand gesture tracking paused (camera remains active in background).', 'info');
     
-    // Hide container
+    // Hide video container overlay
     const container = document.getElementById('gesture-webcam-container');
     if (container) container.style.display = 'none';
 
-    // Stop camera
-    if (cameraHelper) {
-        cameraHelper.stop();
-        cameraHelper = null;
-    }
-
-    if (gestureVideoElement && gestureVideoElement.srcObject) {
-        gestureVideoElement.srcObject.getTracks().forEach(track => track.stop());
-        gestureVideoElement.srcObject = null;
-    }
-
+    // NOTE: We keep the camera stream active in the background to avoid 
+    // browser renegotiation and device warm-up lag on game retries.
+    
     if (gestureIndicatorElement) {
         gestureIndicatorElement.textContent = 'NO HAND DETECTED';
         gestureIndicatorElement.className = 'gesture-indicator';
@@ -1068,5 +1220,321 @@ function drawHandSkeleton(ctx, landmarks, w, h) {
         ctx.arc(pt.x * w, pt.y * h, 3, 0, 2 * Math.PI);
         ctx.fill();
     }
+}
+
+// Render Chibi Avatar on HTML5 Canvas
+function renderCanvasAvatar() {
+    if (!avatarCtx || !avatarCanvas) return;
+
+    const w = avatarCanvas.width;
+    const h = avatarCanvas.height;
+
+    // Smooth horizontal position interpolation
+    let targetX = w / 2; // center
+    if (dancerPosition === 'left') {
+        targetX = w / 2 - 160;
+    } else if (dancerPosition === 'right') {
+        targetX = w / 2 + 160;
+    }
+    canvasDancerX += (targetX - canvasDancerX) * 0.18;
+
+    // Smooth gravity for jumps
+    if (canvasDancerYOffset < 0) {
+        canvasDancerYOffset += 1.5;
+    } else {
+        canvasDancerYOffset = 0;
+    }
+
+    // Smooth bamboo poles sliding transition
+    const targetPolesVal = polesOpen ? 1.0 : 0.0;
+    canvasPolesTransition += (targetPolesVal - canvasPolesTransition) * 0.25;
+
+    // 1. Clear & Stage Background
+    const bgGrad = avatarCtx.createLinearGradient(0, 0, 0, h);
+    bgGrad.addColorStop(0, '#0f0a06');
+    bgGrad.addColorStop(0.5, '#120c08');
+    bgGrad.addColorStop(1, '#1c120c');
+    avatarCtx.fillStyle = bgGrad;
+    avatarCtx.fillRect(0, 0, w, h);
+
+    // Stage Radial Glow
+    const glowGrad = avatarCtx.createRadialGradient(w / 2, h / 2, 20, w / 2, h / 2, 280);
+    glowGrad.addColorStop(0, polesOpen ? 'rgba(46, 204, 113, 0.15)' : 'rgba(211, 84, 0, 0.2)');
+    glowGrad.addColorStop(1, 'transparent');
+    avatarCtx.fillStyle = glowGrad;
+    avatarCtx.fillRect(0, 0, w, h);
+
+    // Floor Line
+    avatarCtx.strokeStyle = 'rgba(211, 84, 0, 0.25)';
+    avatarCtx.lineWidth = 2;
+    avatarCtx.beginPath();
+    avatarCtx.moveTo(40, h - 80);
+    avatarCtx.lineTo(w - 40, h - 80);
+    avatarCtx.stroke();
+
+    // 2. Draw Two Vertical Bamboo Poles (Sliding Horizontally)
+    const poleWidth = 24;
+    const poleHeight = h - 100;
+    const poleY = 20;
+
+    const leftPoleX = (w / 2 - poleWidth) - (canvasPolesTransition * 80);
+    const rightPoleX = (w / 2) + (canvasPolesTransition * 80);
+
+    drawVerticalBambooPole(avatarCtx, leftPoleX, poleY, poleWidth, poleHeight, polesOpen);
+    drawVerticalBambooPole(avatarCtx, rightPoleX, poleY, poleWidth, poleHeight, polesOpen);
+
+    // 3. Draw Chibi Dancer Avatar
+    if (!blindfoldMode) {
+        const isInside = (dancerPosition === 'center');
+        const dancerY = h - 115 + canvasDancerYOffset;
+        drawDancerAvatar(avatarCtx, canvasDancerX, dancerY, isInside, polesOpen);
+    } else {
+        // Blindfold Mode Overlay inside canvas
+        avatarCtx.fillStyle = 'rgba(10, 8, 7, 0.95)';
+        avatarCtx.fillRect(20, 20, w - 40, h - 40);
+
+        avatarCtx.strokeStyle = 'var(--primary)';
+        avatarCtx.lineWidth = 3;
+        avatarCtx.strokeRect(20, 20, w - 40, h - 40);
+
+        avatarCtx.fillStyle = 'var(--text-main)';
+        avatarCtx.font = 'bold 22px "Outfit", sans-serif';
+        avatarCtx.textAlign = 'center';
+        avatarCtx.fillText('🙈 BLINDFOLD MODE ACTIVE', w / 2, h / 2 - 20);
+
+        avatarCtx.fillStyle = 'var(--accent)';
+        avatarCtx.font = '14px "Plus Jakarta Sans", sans-serif';
+        avatarCtx.fillText('Listen to the gongs & clack rhythm. Press SPACE to hop!', w / 2, h / 2 + 15);
+    }
+
+    // Game Over Overlay inside canvas
+    if (gameState === 'GAME_OVER') {
+        avatarCtx.fillStyle = 'rgba(10, 8, 7, 0.85)';
+        avatarCtx.fillRect(0, 0, w, h);
+
+        avatarCtx.fillStyle = '#e74c3c';
+        avatarCtx.font = 'bold 36px "Outfit", sans-serif';
+        avatarCtx.textAlign = 'center';
+        avatarCtx.fillText('💥 caught! GAME OVER', w / 2, h / 2 - 20);
+
+        avatarCtx.fillStyle = 'var(--text-main)';
+        avatarCtx.font = '16px "Plus Jakarta Sans", sans-serif';
+        avatarCtx.fillText(`Final Score: ${score}  |  Click "Start Dancing" to Retry`, w / 2, h / 2 + 25);
+    }
+}
+
+// Draw Vertical 3D Bamboo Pole Helper
+function drawVerticalBambooPole(ctx, x, y, width, height, isOpen) {
+    const grad = ctx.createLinearGradient(x, y, x + width, y);
+    grad.addColorStop(0, '#a3e635');
+    grad.addColorStop(0.5, '#65a30d');
+    grad.addColorStop(1, '#365314');
+
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.roundRect(x, y, width, height, 10);
+    ctx.fill();
+
+    ctx.strokeStyle = '#4d7c0f';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Node markings (horizontal lines on the vertical pole)
+    ctx.fillStyle = '#365314';
+    for (let i = 1; i <= 6; i++) {
+        const nodeY = y + (height / 7) * i;
+        ctx.fillRect(x, nodeY, width, 4);
+    }
+}
+
+// Draw Chibi Dancer Avatar helper
+function drawDancerAvatar(ctx, x, y, isInside, isOpen) {
+    ctx.save();
+    ctx.translate(x, y);
+
+    // Chibi Head Base
+    ctx.fillStyle = '#ffedd5';
+    ctx.beginPath();
+    ctx.ellipse(0, -35, 24, 22, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Eye Color Selection
+    let eyeHex = '#78350f';
+    if (avatarState.eyes === 'blue') eyeHex = '#2563eb';
+    if (avatarState.eyes === 'black') eyeHex = '#18181b';
+    if (avatarState.eyes === 'amber') eyeHex = '#d97706';
+
+    // Eyes
+    ctx.fillStyle = eyeHex;
+    ctx.beginPath();
+    ctx.ellipse(-8, -36, 4, 6, 0, 0, Math.PI * 2);
+    ctx.ellipse(8, -36, 4, 6, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(-9, -38, 1.5, 0, Math.PI * 2);
+    ctx.arc(7, -38, 1.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Blush Cheeks
+    ctx.fillStyle = 'rgba(244, 114, 182, 0.6)';
+    ctx.beginPath();
+    ctx.ellipse(-14, -30, 4, 2, 0, 0, Math.PI * 2);
+    ctx.ellipse(14, -30, 4, 2, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Hair Style Choice
+    let hairColorHex = '#18181b';
+    if (avatarState.hairColor === 'chocolate') hairColorHex = '#451a03';
+    if (avatarState.hairColor === 'gold') hairColorHex = '#f59e0b';
+    if (avatarState.hairColor === 'white') hairColorHex = '#ffffff';
+
+    ctx.fillStyle = hairColorHex;
+    if (avatarState.hair === 'bun') {
+        ctx.beginPath();
+        ctx.arc(0, -42, 22, Math.PI, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(0, -56, 10, 0, Math.PI * 2);
+        ctx.fill();
+    } else if (avatarState.hair === 'hime') {
+        ctx.beginPath();
+        ctx.arc(0, -42, 22, Math.PI, Math.PI * 2);
+        ctx.fill();
+        ctx.fillRect(-22, -42, 6, 30);
+        ctx.fillRect(16, -42, 6, 30);
+    } else if (avatarState.hair === 'spiky') {
+        ctx.beginPath();
+        ctx.moveTo(-22, -40); ctx.lineTo(-14, -58); ctx.lineTo(-4, -45);
+        ctx.lineTo(4, -62); ctx.lineTo(14, -45); ctx.lineTo(22, -40);
+        ctx.fill();
+    } else if (avatarState.hair === 'braids') {
+        ctx.beginPath();
+        ctx.arc(0, -42, 22, Math.PI, Math.PI * 2);
+        ctx.fill();
+        ctx.fillRect(-22, -42, 5, 40);
+        ctx.fillRect(17, -42, 5, 40);
+    } else {
+        // Bald or No Hair
+    }
+
+    // Headwear Feathers / Crown
+    if (avatarState.headwear === 'sugu') {
+        ctx.strokeStyle = '#f59e0b';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(-5, -55); ctx.lineTo(-15, -78);
+        ctx.moveTo(0, -55); ctx.lineTo(0, -84);
+        ctx.moveTo(5, -55); ctx.lineTo(15, -78);
+        ctx.stroke();
+    } else if (avatarState.headwear === 'sinakapan') {
+        ctx.fillStyle = '#dc2626';
+        ctx.fillRect(-18, -48, 36, 6);
+    } else if (avatarState.headwear === 'togung') {
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(0, -55); ctx.lineTo(12, -82);
+        ctx.stroke();
+    }
+
+    // Outfit Clothing Selection
+    let outfitColor = '#1e1b4b'; // Pinongkolo
+    let beadColor = '#ef4444';
+    if (avatarState.clothing === 'warrior') { outfitColor = '#18181b'; beadColor = '#2563eb'; }
+    if (avatarState.clothing === 'bark') { outfitColor = '#78350f'; beadColor = '#d97706'; }
+    if (avatarState.clothing === 'harvest') { outfitColor = '#991b1b'; beadColor = '#f59e0b'; }
+
+    ctx.fillStyle = outfitColor;
+    ctx.beginPath();
+    ctx.roundRect(-14, -12, 28, 24, 6);
+    ctx.fill();
+
+    // Rarik Bead Accent
+    ctx.fillStyle = beadColor;
+    ctx.fillRect(-10, -6, 20, 4);
+    ctx.fillStyle = '#f59e0b';
+    ctx.fillRect(-10, 2, 20, 4);
+
+    // Silver Coin Belt
+    ctx.fillStyle = '#cbd5e1';
+    ctx.fillRect(-12, 8, 24, 3);
+
+    // Arms
+    ctx.strokeStyle = '#ffedd5';
+    ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-14, -10);
+    ctx.lineTo(-24, isInside ? -25 : -5);
+    ctx.moveTo(14, -10);
+    ctx.lineTo(24, isInside ? -25 : -5);
+    ctx.stroke();
+
+    // Feet
+    ctx.fillStyle = '#1e293b';
+    ctx.beginPath();
+    ctx.ellipse(-8, 16, 5, 3, 0, 0, Math.PI * 2);
+    ctx.ellipse(8, 16, 5, 3, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Prop Weapon / Shield
+    if (avatarState.prop === 'kliau') {
+        ctx.fillStyle = '#991b1b';
+        ctx.strokeStyle = '#f59e0b';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(18, -10);
+        ctx.lineTo(32, -28);
+        ctx.lineTo(26, 12);
+        ctx.lineTo(12, 0);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+    }
+
+    ctx.restore();
+}
+
+// Render Chibi Avatar on the standalone Customizer Preview Canvas
+function renderCustomizerPreview() {
+    if (!customizerCtx || !customizerCanvas) return;
+
+    const w = customizerCanvas.width;
+    const h = customizerCanvas.height;
+
+    // Clear background with a subtle dark gradient
+    const bgGrad = customizerCtx.createLinearGradient(0, 0, 0, h);
+    bgGrad.addColorStop(0, '#120c08');
+    bgGrad.addColorStop(1, '#0c0704');
+    customizerCtx.fillStyle = bgGrad;
+    customizerCtx.fillRect(0, 0, w, h);
+
+    // Decorative grid circles / stage light
+    const glowGrad = customizerCtx.createRadialGradient(w / 2, h / 2, 20, w / 2, h / 2, 180);
+    glowGrad.addColorStop(0, 'rgba(211, 84, 0, 0.15)');
+    glowGrad.addColorStop(1, 'transparent');
+    customizerCtx.fillStyle = glowGrad;
+    customizerCtx.fillRect(0, 0, w, h);
+
+    // Platform base / floor line
+    customizerCtx.fillStyle = 'rgba(211, 84, 0, 0.1)';
+    customizerCtx.beginPath();
+    customizerCtx.ellipse(w / 2, h - 100, 80, 20, 0, 0, Math.PI * 2);
+    customizerCtx.fill();
+    customizerCtx.strokeStyle = 'rgba(211, 84, 0, 0.4)';
+    customizerCtx.lineWidth = 1.5;
+    customizerCtx.stroke();
+
+    // Idle breathing offset: bob up and down smoothly over time
+    const breathingOffset = Math.sin(Date.now() / 280) * 4;
+
+    // Draw Chibi Dancer in center
+    const dancerY = h - 145 + breathingOffset;
+    drawDancerAvatar(customizerCtx, w / 2, dancerY, true, true);
 }
 
