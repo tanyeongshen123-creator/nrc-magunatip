@@ -670,7 +670,7 @@ function triggerVisualBeat(beat) {
    ESP32/ESP8266 HARDWARE COMMUNICATION & LED CONTROLLER
    ==================================================== */
 
-let espIp = '192.168.4.1';
+let espIp = '192.168.0.110';
 let espProtocol = 'HTTP'; // 'HTTP', 'WEBSOCKET', 'SERIAL'
 let espMode = 'SLOW';     // 'FAST', 'SLOW'
 
