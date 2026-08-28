@@ -843,10 +843,26 @@ input:checked + .slider-toggle:before {
     border-color: var(--primary);
 }
 
-.instrument-icon {
-    font-size: 3rem;
+.instrument-img-wrapper {
+    width: 100%;
+    height: 160px;
+    overflow: hidden;
+    border-radius: 1rem;
     margin-bottom: 1.5rem;
-    color: var(--accent);
+    border: 1px solid var(--glass-border);
+    background: #000;
+}
+
+.instrument-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+    display: block;
+}
+
+.instrument-card:hover .instrument-img {
+    transform: scale(1.06);
 }
 
 .instrument-card h3 {
@@ -2210,6 +2226,28 @@ footer {
 .comparison-card.active-comparison {
     border-color: var(--primary);
     box-shadow: 0 0 15px rgba(211, 84, 0, 0.15);
+}
+
+.watch-btn {
+    color: var(--accent) !important;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: all 0.3s ease;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    background: rgba(241, 196, 15, 0.05);
+    border: 1px solid rgba(241, 196, 15, 0.1);
+}
+.watch-btn:hover {
+    color: white !important;
+    background: var(--accent);
+    border-color: var(--accent);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(241, 196, 15, 0.2);
 }
 
 /* Viewport stages */
