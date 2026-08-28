@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Explore the visual heritage of the Murut Magunatip bamboo dance. Photo showcase of traditional attire, instruments, performances, and cultural history.">
+    <title>Magunatip - Heritage Gallery</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- Header Navigation -->
+    <header class="main-header">
+        <div class="container header-container">
+            <div class="footer-logo header-logo">MAGU<span>NATIP</span></div>
+            <button class="menu-toggle" id="menu-toggle" aria-label="Toggle Navigation" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="nav-menu" id="nav-menu">
+                <a href="index.html#history">History</a>
+                <a href="index.html#comparisons">Comparisons</a>
+                <a href="index.html#avatar-studio">Avatar Studio</a>
+                <a href="index.html#rhythm">Steps</a>
+                <a href="index.html#play-zone">Play Zone</a>
+                <a href="index.html#esp8266-control" class="nav-highlight">⚡ ESP32/ESP8266 LED</a>
+                <a href="index.html#culture">Attire & Music</a>
+                <a href="gallery.html" style="color: var(--accent); font-weight: 700;">Gallery</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Gallery Hero Section -->
+    <section class="hero" style="min-height: 40vh; padding: 5rem 0 2.5rem; background: radial-gradient(circle at top right, rgba(211, 84, 0, 0.1) 0%, transparent 60%), var(--bg-primary);">
+        <div class="container" style="text-align: center;">
+            <span class="section-badge">Media Showcase</span>
+            <h1 class="text-gradient" style="font-size: 3.5rem; font-weight: 800; margin-bottom: 1.5rem;">Magunatip Heritage Gallery</h1>
+            <p style="color: var(--text-muted); font-size: 1.2rem; max-width: 700px; margin: 0 auto;">Explore the history, performance, traditional clothing, and instrumental beauty of the Murut bamboo dance through our curated photo showcase.</p>
+        </div>
+    </section>
+
+    <!-- Gallery Filters -->
+    <section style="padding-bottom: 2rem;">
+        <div class="container">
+            <div class="gallery-filters">
+                <button class="filter-btn active" data-filter="all">All Photos</button>
+                <button class="filter-btn" data-filter="performances">Performances</button>
+                <button class="filter-btn" data-filter="attire">Attire & Details</button>
+                <button class="filter-btn" data-filter="culture">Historical & Cultural</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Grid -->
+    <section style="padding-bottom: 6rem;">
+        <div class="container">
+            <div class="gallery-grid" id="gallery-grid">
+                
+                <!-- Card 1 -->
+                <div class="gallery-card" data-category="performances">
+                    <div class="gallery-image-wrapper">
+                        <img src="gallery/01 magunatip.jpg" alt="Murut dancers performing high-speed footwork inside clashing bamboo poles" loading="lazy">
+                        <div class="gallery-details">
+                            <h3>Warrior Leap</h3>
+                            <div class="gallery-card-meta">
+                                <span class="gallery-card-tag">Performances</span>
+                                <span class="gallery-zoom-icon">🔍</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="gallery-card" data-category="performances">
+                    <div class="gallery-image-wrapper">
+                        <img src="gallery/02 magunatip.jpeg" alt="Dancers coordinating step timings as bamboo poles clack together" loading="lazy">
+                        <div class="gallery-details">
+                            <h3>Speed Coordination</h3>
+                            <div class="gallery-card-meta">
+                                <span class="gallery-card-tag">Performances</span>
+                                <span class="gallery-zoom-icon">🔍</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="gallery-card" data-category="performances">
+                    <div class="gallery-image-wrapper">
+                        <img src="gallery/03 magunatip.jpeg" alt="Cultural dancers performing Magunatip inside a Murut communal longhouse" loading="lazy">
+                        <div class="gallery-details">
+                            <h3>Longhouse Gathering</h3>
+                            <div class="gallery-card-meta">
+                                <span class="gallery-card-tag">Performances</span>
+                                <span class="gallery-zoom-icon">🔍</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="gallery-card" data-category="performances">
+                    <div class="gallery-image-wrapper">
+                        <img src="gallery/04 magunatip.jpeg" alt="Agile footwork of dancers dodging wood claps at high tempo" loading="lazy">
+                        <div class="gallery-details">
+                            <h3>Clack and Leap</h3>
+                            <div class="gallery-card-meta">
+                                <span class="gallery-card-tag">Performances</span>
+                                <span class="gallery-zoom-icon">🔍</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="gallery-card" data-category="performances">
+                    <div class="gallery-image-wrapper">
+                        <img src="gallery/05 magunatip.jpg" alt="Dancers crossing poles diagonally at peak tempo" loading="lazy">
+                        <div class="gallery-details">
+                            <h3>Bamboo Crossings</h3>
+                            <div class="gallery-card-meta">
+                                <span class="gallery-card-tag">Performances</span>
+                                <span class="gallery-zoom-icon">🔍</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 6 -->
+                <div class="gallery-card" data-category="performances">
+                    <div class="gallery-image-wrapper">
+                        <img src="gallery/06 magunatip.jpg" alt="Babalian traditional ritual execution of the dance" loading="lazy">
+                        <div class="gallery-details">
+                            <h3>The Babalian Beat</h3>
+                            <div class="gallery-card-meta">
+                                <span class="gallery-card-tag">Performances</span>
+                                <span class="gallery-zoom-icon">🔍</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 7 -->
+                <div class="gallery-card" data-category="attire">
+                    <div class="gallery-image-wrapper">
+                        <img src="gallery/07 magunatip.jpg" alt="Close-up of traditional Pinongkolo beaded dress with geometric motifs" loading="lazy">
+                        <div class="gallery-details">
+                            <h3>Pinongkolo Detail</h3>
+                            <div class="gallery-card-meta">
+                                <span class="gallery-card-tag">Attire & Details</span>
+                                <span class="gallery-zoom-icon">🔍</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 8 -->
+                <div class="gallery-card" data-category="attire">
+                    <div class="gallery-image-wrapper">
+                        <img src="gallery/08 magunatip.jpg" alt="The traditional Sugu Tinggi headpiece adorned with pheasant feathers" loading="lazy">
+                        <div class="gallery-details">
+                            <h3>Sugu Tinggi Feathers</h3>
+                            <div class="gallery-card-meta">
+                                <span class="gallery-card-tag">Attire & Details</span>
+                                <span class="gallery-zoom-icon">🔍</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 9 -->
+                <div class="gallery-card" data-category="attire">
+                    <div class="gallery-image-wrapper">
+                        <img src="gallery/09 magunatip.jpeg" alt="Silver and brass coin belt (Pipirot) decoration on female attire" loading="lazy">
+                        <div class="gallery-details">
+                            <h3>Pipirot Coin Belt</h3>
+                            <div class="gallery-card-meta">
+                                <span class="gallery-card-tag">Attire & Details</span>
+                                <span class="gallery-zoom-icon">🔍</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 10 -->
+                <div class="gallery-card" data-category="attire">
+                    <div class="gallery-image-wrapper">
+                        <img src="gallery/10 magunatip.jpeg" alt="Murut warrior bark vest (Babaru) and shield details" loading="lazy">
+                        <div class="gallery-details">
+                            <h3>Tagol Vest & Shield</h3>
+                            <div class="gallery-card-meta">
+                                <span class="gallery-card-tag">Attire & Details</span>
+                                <span class="gallery-zoom-icon">🔍</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 11 -->
+                <div class="gallery-card" data-category="culture">
+                    <div class="gallery-image-wrapper">
+                        <img src="gallery/001.jpg" alt="Traditional brass gongs (Sansaring) set used to guide transitions" loading="lazy">
+                        <div class="gallery-details">
+                            <h3>Sansaring Gongs</h3>
+                            <div class="gallery-card-meta">
+                                <span class="gallery-card-tag">Historical & Cultural</span>
+                                <span class="gallery-zoom-icon">🔍</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 12 -->
+                <div class="gallery-card" data-category="culture">
+                    <div class="gallery-image-wrapper">
+                        <img src="gallery/002.jpg" alt="Thick Buluh Tering bamboo poles cured over fire smoke" loading="lazy">
+                        <div class="gallery-details">
+                            <h3>Buluh Tering Curing</h3>
+                            <div class="gallery-card-meta">
+                                <span class="gallery-card-tag">Historical & Cultural</span>
+                                <span class="gallery-zoom-icon">🔍</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 13 -->
+                <div class="gallery-card" data-category="culture">
+                    <div class="gallery-image-wrapper">
+                        <img src="gallery/003.jpg" alt="Archive photo of Murut villagers gathered for a spirit healing ceremony" loading="lazy">
+                        <div class="gallery-details">
+                            <h3>Historical Murut Group</h3>
+                            <div class="gallery-card-meta">
+                                <span class="gallery-card-tag">Historical & Cultural</span>
+                                <span class="gallery-zoom-icon">🔍</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 14 -->
+                <div class="gallery-card" data-category="culture">
+                    <div class="gallery-image-wrapper">
+                        <img src="gallery/004.jpg" alt="Wooden floor base blocks designed to hold the clashing bamboos" loading="lazy">
+                        <div class="gallery-details">
+                            <h3>Bamboo Striking Blocks</h3>
+                            <div class="gallery-card-meta">
+                                <span class="gallery-card-tag">Historical & Cultural</span>
+                                <span class="gallery-zoom-icon">🔍</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 15 -->
+                <div class="gallery-card" data-category="culture">
+                    <div class="gallery-image-wrapper">
+                        <img src="gallery/005.jpg" alt="Traditional single-headed skin drum (Jarang) for keeping tempo" loading="lazy">
+                        <div class="gallery-details">
+                            <h3>Jarang Drumming</h3>
+                            <div class="gallery-card-meta">
+                                <span class="gallery-card-tag">Historical & Cultural</span>
+                                <span class="gallery-zoom-icon">🔍</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox-modal" role="dialog" aria-modal="true" aria-label="Image Lightbox">
+        <button id="lightbox-close" class="lightbox-close" aria-label="Close Lightbox">&times;</button>
+        <button id="lightbox-prev" class="lightbox-nav lightbox-prev" aria-label="Previous Image">&#10094;</button>
+        <button id="lightbox-next" class="lightbox-nav lightbox-next" aria-label="Next Image">&#10095;</button>
+        
+        <div class="lightbox-content">
+            <img id="lightbox-img" src="" alt="">
+            <div id="lightbox-caption" class="lightbox-caption">
+                <h3 id="caption-title"></h3>
+                <p id="caption-tag"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container footer-content">
+            <div>
+                <div class="footer-logo">MAGU<span>NATIP</span></div>
+                <div class="footer-flag">
+                    <div class="flag-blue" style="background: #002B7F;"></div>
+                    <div class="flag-white" style="background: #E22026;"></div>
+                    <div class="flag-red" style="background: #FFC72C;"></div>
+                </div>
+                <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">Celebrating Sabahan
+                    Indigenous Folk Art and Murut Heritage.</p>
+            </div>
+            <div class="footer-links">
+                <a href="index.html#history">History</a>
+                <a href="index.html#rhythm">Steps</a>
+                <a href="index.html#play-zone">Play Zone</a>
+                <a href="index.html#culture">Attire</a>
+                <a href="gallery.html">Gallery</a>
+            </div>
+        </div>
+        <div class="container"
+            style="margin-top: 3rem; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 2rem; font-size: 0.8rem; color: rgba(255,255,255,0.2);">
+            &copy; 2026 Magunatip Interactive. Designed with &hearts; for the Future Innovator Showcase.
+        </div>
+    </footer>
+
+    <!-- Interactive Scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- MOBILE MENU TOGGLE ---
+            const menuToggle = document.getElementById('menu-toggle');
+            const navMenu = document.getElementById('nav-menu');
+            
+            if (menuToggle && navMenu) {
+                menuToggle.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isExpanded = menuToggle.getAttribute('aria-expanded') === 'true';
+                    menuToggle.setAttribute('aria-expanded', !isExpanded);
+                    menuToggle.classList.toggle('active');
+                    navMenu.classList.toggle('active');
+                    document.body.classList.toggle('menu-open');
+                });
+
+                // Close menu when clicking a link
+                navMenu.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        menuToggle.setAttribute('aria-expanded', 'false');
+                        menuToggle.classList.remove('active');
+                        navMenu.classList.remove('active');
+                        document.body.classList.remove('menu-open');
+                    });
+                });
+
+                // Close menu when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (navMenu.classList.contains('active') && 
+                        !navMenu.contains(e.target) && 
+                        !menuToggle.contains(e.target)) {
+                        menuToggle.setAttribute('aria-expanded', 'false');
+                        menuToggle.classList.remove('active');
+                        navMenu.classList.remove('active');
+                        document.body.classList.remove('menu-open');
+                    }
+                });
+            }
+
+            // --- GALLERY FILTERING LOGIC ---
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const cards = document.querySelectorAll('.gallery-card');
+
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Update active button classes
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    const filterValue = button.getAttribute('data-filter');
+
+                    cards.forEach(card => {
+                        card.classList.remove('filtering'); // reset animation
+                        const category = card.getAttribute('data-category');
+
+                        if (filterValue === 'all' || filterValue === category) {
+                            card.style.display = 'block';
+                            // Trigger small entry animation
+                            setTimeout(() => {
+                                card.classList.add('filtering');
+                            }, 10);
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                    
+                    // Re-evaluate visible images for lightbox mapping
+                    updateVisibleImages();
+                });
+            });
+
+            // --- LIGHTBOX INTERACTIVE VIEWER ---
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            const captionTitle = document.getElementById('caption-title');
+            const captionTag = document.getElementById('caption-tag');
+            
+            const btnClose = document.getElementById('lightbox-close');
+            const btnPrev = document.getElementById('lightbox-prev');
+            const btnNext = document.getElementById('lightbox-next');
+
+            let visibleCards = Array.from(cards);
+            let currentIndex = 0;
+
+            function updateVisibleImages() {
+                visibleCards = Array.from(cards).filter(card => card.style.display !== 'none');
+            }
+
+            function openLightbox(index) {
+                currentIndex = index;
+                const card = visibleCards[currentIndex];
+                const img = card.querySelector('img');
+                const title = card.querySelector('h3').textContent;
+                const tag = card.querySelector('.gallery-card-tag').textContent;
+
+                lightboxImg.src = img.src;
+                lightboxImg.alt = img.alt;
+                captionTitle.textContent = title;
+                captionTag.textContent = tag;
+
+                lightbox.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Lock scrolling
+            }
+
+            function closeLightbox() {
+                lightbox.classList.remove('active');
+                document.body.style.overflow = ''; // Unlock scrolling
+                setTimeout(() => {
+                    lightboxImg.src = '';
+                }, 350); // Clear source after close transition finishes
+            }
+
+            function navigate(direction) {
+                if (visibleCards.length === 0) return;
+                
+                currentIndex += direction;
+                if (currentIndex >= visibleCards.length) {
+                    currentIndex = 0; // Wrap to start
+                } else if (currentIndex < 0) {
+                    currentIndex = visibleCards.length - 1; // Wrap to end
+                }
+                
+                // Switch image with a quick opacity flash
+                lightboxImg.style.opacity = 0.5;
+                setTimeout(() => {
+                    openLightbox(currentIndex);
+                    lightboxImg.style.opacity = 1;
+                }, 100);
+            }
+
+            // Click card events
+            cards.forEach(card => {
+                card.addEventListener('click', () => {
+                    updateVisibleImages();
+                    const index = visibleCards.indexOf(card);
+                    if (index !== -1) {
+                        openLightbox(index);
+                    }
+                });
+            });
+
+            // Controls listeners
+            btnClose.addEventListener('click', closeLightbox);
+            btnNext.addEventListener('click', () => navigate(1));
+            btnPrev.addEventListener('click', () => navigate(-1));
+
+            // Close on background click
+            lightbox.addEventListener('click', (e) => {
+                if (e.target === lightbox || e.target.classList.contains('lightbox-content')) {
+                    closeLightbox();
+                }
+            });
+
+            // Keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                if (!lightbox.classList.contains('active')) return;
+                
+                if (e.key === 'Escape') {
+                    closeLightbox();
+                } else if (e.key === 'ArrowRight') {
+                    navigate(1);
+                } else if (e.key === 'ArrowLeft') {
+                    navigate(-1);
+                }
+            });
+
+            // Touch Swipe Support for mobile devices
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            lightbox.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            lightbox.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, { passive: true });
+
+            function handleSwipe() {
+                const threshold = 50; // min swipe distance in px
+                if (touchEndX < touchStartX - threshold) {
+                    navigate(1); // Swiped Left -> Next
+                }
+                if (touchEndX > touchStartX + threshold) {
+                    navigate(-1); // Swiped Right -> Prev
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
