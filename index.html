@@ -27,6 +27,7 @@
                 <a href="#avatar-studio">Avatar Studio</a>
                 <a href="#rhythm">Steps</a>
                 <a href="#play-zone">Play Zone</a>
+                <a href="#ar-gong">AR Gong</a>
                 <a href="#esp8266-control" class="nav-highlight">⚡ ESP32/ESP8266 LED</a>
                 <a href="#culture">Attire & Music</a>
                 <a href="gallery.html">Gallery</a>
@@ -345,12 +346,13 @@
             </div>
 
             <!-- Video Tutorial Guide -->
-            <div class="video-guide-wrapper" style="margin: 0 auto 3rem; overflow: hidden; padding: 0; max-width: 800px; width: 100%; border: 1px solid var(--glass-border); border-radius: 1.5rem; box-shadow: var(--glass-shadow);">
-                <div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
-                    <iframe 
-                        src="https://www.youtube.com/embed/xDvV2SRnCPA" 
-                        title="How to Dance Magunatip Video Tutorial" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            <div class="video-guide-wrapper"
+                style="margin: 0 auto 3rem; overflow: hidden; padding: 0; max-width: 800px; width: 100%; border: 1px solid var(--glass-border); border-radius: 1.5rem; box-shadow: var(--glass-shadow);">
+                <div class="video-container"
+                    style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+                    <iframe src="https://www.youtube.com/embed/xDvV2SRnCPA"
+                        title="How to Dance Magunatip Video Tutorial"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                         allowfullscreen
                         style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;">
                     </iframe>
@@ -534,20 +536,6 @@
                                     Dancing</button>
                             </div>
                         </div>
-
-                        <!-- Floating Webcam Picture-in-Picture for Hand Gesture Tracking -->
-                        <div id="gesture-webcam-container" class="gesture-webcam-container">
-                            <video id="webcam-video" class="gesture-video" width="320" height="240" autoplay muted
-                                playsinline></video>
-                            <canvas id="gesture-canvas" class="gesture-canvas" width="160" height="120"></canvas>
-                            <div id="gesture-loading" class="gesture-loading">
-                                <div class="gesture-spinner"></div>
-                                <span>Loading Hand Tracker...</span>
-                            </div>
-                            <div id="gesture-indicator" class="gesture-indicator">
-                                NO HAND DETECTED
-                            </div>
-                        </div>
                     </div>
 
                     <div class="game-instructions-hint" style="margin-top: 1rem;">
@@ -556,66 +544,168 @@
                     </div>
                 </div>
 
-                <!-- Column 2: Dance Settings & Metronome Panel -->
-                <div class="glass-card game-controls-panel">
-                    <h3 class="text-gradient-accent">Settings & Beat</h3>
-
-                    <div class="game-control-row" style="flex-direction: column; align-items: stretch; gap: 0.75rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>Tempo (BPM)</span>
-                            <span id="bpm-val" style="color: var(--accent); font-weight: 700;">110 (SLOW)</span>
+                <!-- Column 2: Camera & Settings Stack -->
+                <div style="display: flex; flex-direction: column; gap: 2rem; width: 100%;">
+                    <!-- Webcam Hand Tracking Panel -->
+                    <div id="gesture-webcam-container" class="gesture-webcam-container">
+                        <video id="webcam-video" class="gesture-video" width="320" height="240" autoplay muted
+                            playsinline></video>
+                        <canvas id="gesture-canvas" class="gesture-canvas" width="160" height="120"></canvas>
+                        <div id="gesture-loading" class="gesture-loading">
+                            <div class="gesture-spinner"></div>
+                            <span>Loading Hand Tracker...</span>
                         </div>
-                        <div class="dance-mode-buttons" style="display: flex; gap: 0.75rem;">
-                            <button type="button" id="btn-dance-slow" class="btn btn-secondary active-speed"
-                                style="flex: 1; padding: 0.6rem; border-radius: 0.75rem; font-size: 0.95rem;">Slow</button>
-                            <button type="button" id="btn-dance-fast" class="btn btn-secondary"
-                                style="flex: 1; padding: 0.6rem; border-radius: 0.75rem; font-size: 0.95rem;">Fast</button>
+                        <div id="gesture-indicator" class="gesture-indicator">
+                            NO HAND DETECTED
                         </div>
                     </div>
 
+                    <!-- Dance Settings & Metronome Panel -->
+                    <div class="glass-card game-controls-panel">
+                        <h3 class="text-gradient-accent">Settings & Beat</h3>
 
-                    <div class="game-control-row">
-                        <span>Mute Audio</span>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="mute-toggle">
-                            <span class="slider-toggle"></span>
-                        </label>
+                        <div class="game-control-row"
+                            style="flex-direction: column; align-items: stretch; gap: 0.75rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span>Tempo (BPM)</span>
+                                <span id="bpm-val" style="color: var(--accent); font-weight: 700;">110 (SLOW)</span>
+                            </div>
+                            <div class="dance-mode-buttons" style="display: flex; gap: 0.75rem;">
+                                <button type="button" id="btn-dance-slow" class="btn btn-secondary active-speed"
+                                    style="flex: 1; padding: 0.6rem; border-radius: 0.75rem; font-size: 0.95rem;">Slow</button>
+                                <button type="button" id="btn-dance-fast" class="btn btn-secondary"
+                                    style="flex: 1; padding: 0.6rem; border-radius: 0.75rem; font-size: 0.95rem;">Fast</button>
+                            </div>
+                        </div>
+
+
+                        <div class="game-control-row">
+                            <span>Mute Audio</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="mute-toggle">
+                                <span class="slider-toggle"></span>
+                            </label>
+                        </div>
+
+                        <div class="game-control-row">
+                            <span>Blindfold Mode 🙈</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="blindfold-toggle">
+                                <span class="slider-toggle"></span>
+                            </label>
+                        </div>
+
+                        <div class="game-control-row">
+                            <span>Auto-AI Play 🤖</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="autohop-toggle">
+                                <span class="slider-toggle"></span>
+                            </label>
+                        </div>
+
+                        <div>
+                            <h4
+                                style="margin-bottom: 0.75rem; font-size: 1rem; text-transform: uppercase; color: var(--text-muted);">
+                                Metronome Beat</h4>
+                            <div class="metronome-visualizer">
+                                <div class="beat-indicator" id="beat-ind-1">
+                                    <div class="beat-num">1</div>
+                                    <div class="beat-label">Open</div>
+                                </div>
+                                <div class="beat-indicator strike" id="beat-ind-2">
+                                    <div class="beat-num">2</div>
+                                    <div class="beat-label">Clack</div>
+                                </div>
+                                <div class="beat-indicator strike" id="beat-ind-3">
+                                    <div class="beat-num">3</div>
+                                    <div class="beat-label">Clack</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive AR Gong Studio Section -->
+    <section id="ar-gong" class="info-section"
+        style="background: radial-gradient(circle at center, rgba(241, 196, 15, 0.06) 0%, transparent 70%), var(--bg-primary);">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge"
+                    style="background: rgba(241, 196, 15, 0.15); color: var(--accent);">Interactive AR</span>
+                <h2>AR Gong Studio (Sansaring)</h2>
+                <p>Strike virtual brass gongs in mid-air using your camera. Allow camera access, raise your hands, and
+                    hit the glowing metallic circles to play traditional beats!</p>
+            </div>
+
+            <div class="ar-gong-grid">
+                <!-- Column 1: AR Canvas Feed -->
+                <div class="glass-card" style="padding: 1rem; overflow: hidden; position: relative;">
+                    <div
+                        style="position: relative; width: 100%; aspect-ratio: 4 / 3; background: rgba(0, 0, 0, 0.4); border-radius: 1rem; overflow: hidden;">
+                        <canvas id="gong-ar-canvas" width="640" height="480"
+                            style="width: 100%; height: 100%; display: block; object-fit: cover;"></canvas>
+
+                        <!-- Loading Overlay -->
+                        <div id="gong-ar-loading" class="gesture-loading" style="display: none;">
+                            <div class="gesture-spinner"></div>
+                            <span>Loading AR Camera...</span>
+                        </div>
                     </div>
 
-                    <div class="game-control-row">
-                        <span>Blindfold Mode 🙈</span>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="blindfold-toggle">
-                            <span class="slider-toggle"></span>
-                        </label>
+                    <div
+                        style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <button id="btn-toggle-ar-gong" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">
+                            🎥 Start AR Gong
+                        </button>
+                        <div id="ar-gong-indicator" class="gesture-indicator"
+                            style="position: static; transform: none; display: inline-block;">
+                            CAMERA INACTIVE
+                        </div>
                     </div>
+                </div>
 
-                    <div class="game-control-row">
-                        <span>Auto-AI Play 🤖</span>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="autohop-toggle">
-                            <span class="slider-toggle"></span>
-                        </label>
-                    </div>
-
+                <!-- Column 2: Gong Information & Info Cards -->
+                <div class="glass-card game-controls-panel"
+                    style="display: flex; flex-direction: column; justify-content: space-between;">
                     <div>
-                        <h4
-                            style="margin-bottom: 0.75rem; font-size: 1rem; text-transform: uppercase; color: var(--text-muted);">
-                            Metronome Beat</h4>
-                        <div class="metronome-visualizer">
-                            <div class="beat-indicator" id="beat-ind-1">
-                                <div class="beat-num">1</div>
-                                <div class="beat-label">Open</div>
+                        <h3 class="text-gradient-accent" style="margin-bottom: 1rem;">Sansaring Heritage</h3>
+                        <p
+                            style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem;">
+                            The <strong>Sansaring</strong> is a set of hanging brass gongs essential to Murut dance
+                            ensembles.
+                            In Magunatip, they provide melodic alignment and signal tempo shifts to the dancers.
+                        </p>
+
+                        <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
+                            <div
+                                style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 0.8rem 1.2rem; border-radius: 1rem;">
+                                <strong style="color: #e74c3c; font-size: 0.9rem;">🔴 Low Gong (Agung)</strong>
+                                <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;">Provides
+                                    the deep, grounding base beat (A2 note). Tap on the left side.</p>
                             </div>
-                            <div class="beat-indicator strike" id="beat-ind-2">
-                                <div class="beat-num">2</div>
-                                <div class="beat-label">Clack</div>
+                            <div
+                                style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 0.8rem 1.2rem; border-radius: 1rem;">
+                                <strong style="color: #f1c40f; font-size: 0.9rem;">🟡 Medium Gong (Kempul)</strong>
+                                <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;">Fills the
+                                    mid-range rhythm (E3 note). Tap in the center upper area.</p>
                             </div>
-                            <div class="beat-indicator strike" id="beat-ind-3">
-                                <div class="beat-num">3</div>
-                                <div class="beat-label">Clack</div>
+                            <div
+                                style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 0.8rem 1.2rem; border-radius: 1rem;">
+                                <strong style="color: #2ecc71; font-size: 0.9rem;">🟢 High Gong (Sansaring)</strong>
+                                <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;">Directs
+                                    the melody and transitions (A3 note). Tap on the right side.</p>
                             </div>
                         </div>
+                    </div>
+
+                    <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1rem; text-align: center;">
+                        <span
+                            style="font-size: 0.85rem; color: var(--accent); font-weight: 700; letter-spacing: 0.05em;">
+                            💡 TIP: Raise your hand and touch the gongs in the camera feed to strike them!
+                        </span>
                     </div>
                 </div>
             </div>
@@ -819,6 +909,7 @@
                 <a href="#history">History</a>
                 <a href="#rhythm">Steps</a>
                 <a href="#play-zone">Play Zone</a>
+                <a href="#ar-gong">AR Gong</a>
                 <a href="#culture">Attire</a>
                 <a href="gallery.html">Gallery</a>
             </div>
