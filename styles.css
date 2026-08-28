@@ -549,7 +549,9 @@ input:checked + .slider-toggle:before {
     border-radius: 1.5rem;
     border: 2px solid var(--glass-border);
     position: relative;
-    height: 400px;
+    width: 100%;
+    aspect-ratio: 600 / 380;
+    height: auto;
     overflow: hidden;
     box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
     display: flex;
@@ -823,7 +825,7 @@ input:checked + .slider-toggle:before {
 /* Rondalla Section */
 .rondalla-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 2.5rem;
     margin-top: 3rem;
 }
@@ -2263,3 +2265,238 @@ footer {
         gap: 3rem;
     }
 }
+
+/* Main Header Styles */
+.main-header {
+    background: rgba(18, 12, 8, 0.95);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+    border-bottom: 1px solid var(--glass-border);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 70px;
+}
+
+.header-logo {
+    margin: 0 !important;
+    font-size: 1.6rem !important;
+}
+
+.nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.nav-menu a {
+    color: var(--text-main);
+    transition: var(--transition);
+}
+
+.nav-menu a:hover {
+    color: var(--primary-light);
+}
+
+.nav-menu a.nav-highlight {
+    color: var(--accent) !important;
+    font-weight: 700 !important;
+}
+
+/* Menu Toggle Hamburger Icon */
+.menu-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 26px;
+    height: 18px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 110;
+}
+
+.menu-toggle span {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background-color: var(--text-main);
+    border-radius: 2px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Mobile Menu Animation States */
+.menu-toggle.active span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+}
+
+.menu-toggle.active span:nth-child(2) {
+    opacity: 0;
+    transform: translateX(-10px);
+}
+
+.menu-toggle.active span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+}
+
+/* Base adjustment for body when header is fixed */
+body {
+    padding-top: 70px; /* Offset fixed header height */
+}
+
+/* Media Queries for Responsive Header Navigation */
+@media (max-width: 1024px) {
+    .menu-toggle {
+        display: flex;
+    }
+
+    /* Convert Nav Menu into a Glassmorphic Slide-Out Drawer */
+    .nav-menu {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 300px;
+        max-width: 85%;
+        height: 100vh;
+        background: rgba(18, 12, 8, 0.98);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-left: 1px solid var(--glass-border);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 2.2rem;
+        padding: 4rem 2rem;
+        box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+        transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        z-index: 105;
+    }
+
+    .nav-menu.active {
+        right: 0;
+    }
+
+    .nav-menu a {
+        font-size: 1.2rem;
+        width: 100%;
+        text-align: center;
+        padding: 0.5rem 0;
+    }
+
+    body.menu-open {
+        overflow: hidden;
+    }
+}
+
+/* Mobile Layout Overrides and Scaling */
+@media (max-width: 768px) {
+    .hero-content h1 {
+        font-size: 2.8rem !important;
+        line-height: 1.2;
+    }
+    
+    .section-header h2 {
+        font-size: 2.2rem !important;
+    }
+
+    section.info-section {
+        padding: 5rem 0;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-content h1 {
+        font-size: 2.2rem !important;
+        line-height: 1.2;
+    }
+
+    .hero-content p {
+        font-size: 1.05rem;
+    }
+
+    .section-header h2 {
+        font-size: 1.8rem !important;
+    }
+
+    .section-header p {
+        font-size: 1rem;
+    }
+
+    .hero-buttons {
+        gap: 1rem;
+        width: 100%;
+    }
+
+    .hero-buttons .btn {
+        flex: 1;
+        min-width: 140px;
+        padding: 0.8rem 1.5rem;
+        font-size: 0.95rem;
+    }
+
+    /* Metronome indicators scaling */
+    .metronome-visualizer {
+        gap: 0.5rem;
+    }
+
+    .beat-indicator {
+        padding: 1rem 0.5rem;
+        border-radius: 0.75rem;
+    }
+
+    .beat-num {
+        font-size: 1.8rem;
+    }
+
+    .beat-label {
+        font-size: 0.65rem;
+        letter-spacing: 0.05em;
+    }
+
+    /* HUD layout spacing */
+    .game-hud {
+        gap: 0.5rem;
+    }
+
+    .hud-score, .hud-lives {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+    }
+
+    /* Scale down webcam overlay for mobile screens */
+    .gesture-webcam-container {
+        bottom: 1rem;
+        right: 1rem;
+        width: 120px !important;
+        height: 90px !important;
+        border-radius: 0.75rem;
+    }
+
+    .gesture-indicator {
+        font-size: 0.55rem;
+        padding: 0.15rem 0.4rem;
+        bottom: 4px;
+    }
+
+    .gesture-loading span {
+        font-size: 0.6rem;
+    }
+
+    .gesture-spinner {
+        width: 18px;
+        height: 18px;
+    }
+}
+
