@@ -435,8 +435,24 @@ section.info-section {
 
 @media (min-width: 992px) {
     .simulator-area {
-        grid-template-columns: 1.5fr 1fr;
+        grid-template-columns: 1.5fr 1fr; /* Game Viewport on left, Stack on right */
         gap: 3rem;
+        align-items: start;
+    }
+}
+
+/* Interactive AR Gong Zone Grid */
+.ar-gong-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+}
+
+@media (min-width: 992px) {
+    .ar-gong-grid {
+        grid-template-columns: 1.3fr 1fr; /* 2 balanced columns */
+        gap: 3rem;
+        align-items: stretch;
     }
 }
 
@@ -2072,23 +2088,21 @@ footer {
 /* Hand Gesture Tracking UI */
 .gesture-webcam-container {
     display: none; /* hidden by default, toggled by JS */
-    position: absolute;
-    bottom: 1.5rem;
-    right: 1.5rem;
-    width: 160px;
-    height: 120px;
-    background: rgba(18, 12, 8, 0.9);
-    border: 2px solid var(--primary);
-    border-radius: 1rem;
+    position: relative;
+    width: 100%;
+    max-width: 100%; /* fill right column width */
+    aspect-ratio: 4 / 3;
+    background: rgba(18, 12, 8, 0.4);
+    border: 1px solid var(--glass-border);
+    border-radius: 1.5rem;
     overflow: hidden;
-    z-index: 15;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 10px rgba(211, 84, 0, 0.2);
+    box-shadow: var(--glass-shadow);
     transition: var(--transition);
 }
 
 .gesture-webcam-container:hover {
-    border-color: var(--accent);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 15px rgba(241, 196, 15, 0.3);
+    border-color: var(--primary);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(211, 84, 0, 0.15);
 }
 
 .gesture-video {
@@ -2141,15 +2155,15 @@ footer {
 
 .gesture-indicator {
     position: absolute;
-    bottom: 6px;
+    bottom: 12px;
     left: 50%;
     transform: translateX(-50%);
     background: rgba(18, 12, 8, 0.85);
     border: 1px solid var(--glass-border);
     backdrop-filter: blur(4px);
-    padding: 0.25rem 0.6rem;
+    padding: 0.35rem 0.8rem;
     border-radius: 0.5rem;
-    font-size: 0.65rem;
+    font-size: 0.8rem;
     color: var(--text-main);
     font-weight: 700;
     font-family: 'Outfit', sans-serif;
@@ -2366,15 +2380,16 @@ footer {
 .nav-menu {
     display: flex;
     align-items: center;
-    gap: 2rem;
+    gap: 1.1rem; /* reduced from 2rem to fit all items */
     font-family: 'Outfit', sans-serif;
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 0.88rem; /* slightly reduced from 0.95rem */
 }
 
 .nav-menu a {
     color: var(--text-main);
     transition: var(--transition);
+    white-space: nowrap; /* prevent words wrapping to new lines */
 }
 
 .nav-menu a:hover {
@@ -2547,29 +2562,6 @@ body {
         font-size: 0.8rem;
     }
 
-    /* Scale down webcam overlay for mobile screens */
-    .gesture-webcam-container {
-        bottom: 1rem;
-        right: 1rem;
-        width: 120px !important;
-        height: 90px !important;
-        border-radius: 0.75rem;
-    }
-
-    .gesture-indicator {
-        font-size: 0.55rem;
-        padding: 0.15rem 0.4rem;
-        bottom: 4px;
-    }
-
-    .gesture-loading span {
-        font-size: 0.6rem;
-    }
-
-    .gesture-spinner {
-        width: 18px;
-        height: 18px;
-    }
 }
 
 /* ====================================================
