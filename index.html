@@ -13,18 +13,21 @@
 <body>
 
     <!-- Header Navigation -->
-    <header
-        style="background: rgba(18, 12, 8, 0.95); position: fixed; top: 0; width: 100%; z-index: 100; border-bottom: 1px solid var(--glass-border); backdrop-filter: blur(8px);">
-        <div class="container"
-            style="display: flex; justify-content: space-between; align-items: center; height: 70px;">
-            <div class="footer-logo" style="margin: 0; font-size: 1.6rem;">MAGU<span>NATIP</span></div>
-            <nav class="footer-links" style="font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 0.95rem;">
+    <header class="main-header">
+        <div class="container header-container">
+            <div class="footer-logo header-logo">MAGU<span>NATIP</span></div>
+            <button class="menu-toggle" id="menu-toggle" aria-label="Toggle Navigation" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="nav-menu" id="nav-menu">
                 <a href="#history">History</a>
                 <a href="#comparisons">Comparisons</a>
                 <a href="#avatar-studio">Avatar Studio</a>
                 <a href="#rhythm">Steps</a>
                 <a href="#play-zone">Play Zone</a>
-                <a href="#esp8266-control" style="color: var(--accent); font-weight: 700;">⚡ ESP32/ESP8266 LED</a>
+                <a href="#esp8266-control" class="nav-highlight">⚡ ESP32/ESP8266 LED</a>
                 <a href="#culture">Attire & Music</a>
             </nav>
         </div>
@@ -328,7 +331,8 @@
                             style="background: rgba(231,76,60,0.15); color: #e74c3c;">CLOSED</span></h3>
                     <p>The poles remain closed as they are struck together again. The dancer must leap quickly
                         <strong>outside</strong> the poles to the left or right to avoid getting their feet caught by
-                        the fast-moving wood.</p>
+                        the fast-moving wood.
+                    </p>
                     <div class="step-feet-visual">
                         <svg class="foot-icon foot-left active-step" viewBox="0 0 60 100"
                             style="opacity: 1; fill: var(--primary);">
@@ -650,7 +654,8 @@
                             tail feathers of the Great Argus Pheasant (<strong>Burung Kuang</strong>). Men wear the
                             <strong>Babaru Puot</strong> (a black bark vest with red details), a loincloth, and the
                             <strong>Pinongkol</strong> feathered headgear. Warriors dance completely barefoot to
-                            navigate the rapid poles.</p>
+                            navigate the rapid poles.
+                        </p>
                     </div>
 
                     <div class="clothing-card">
