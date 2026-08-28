@@ -56,6 +56,16 @@ let gestureCanvasCtx = null;
 let gestureLoadingOverlay = null;
 let gestureIndicatorElement = null;
 
+// AR Gong state variables
+let gongArActive = false;
+let gongArCanvas = null;
+let gongArCtx = null;
+const virtualGongs = [
+    { id: 1, name: 'Agung (Low)', x: 0.22, y: 0.55, r: 0.12, freq: 110.0, color: '#e74c3c', label: 'A2', active: false, pulse: 0 },
+    { id: 2, name: 'Kempul (Medium)', x: 0.5, y: 0.35, r: 0.10, freq: 164.81, color: '#f1c40f', label: 'E3', active: false, pulse: 0 },
+    { id: 3, name: 'Sansaring (High)', x: 0.78, y: 0.55, r: 0.08, freq: 220.0, color: '#2ecc71', label: 'A3', active: false, pulse: 0 }
+];
+
 // 3/4 Magunatip rhythm chord progression (A minor, D minor, G major, C major)
 const accompaniment = [
     // Measure 0: A minor (A2, C4+E4)
@@ -269,6 +279,18 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // AR Gong Elements & Bindings
+    gongArCanvas = document.getElementById('gong-ar-canvas');
+    if (gongArCanvas) {
+        gongArCtx = gongArCanvas.getContext('2d');
+    }
+    const btnToggleArGong = document.getElementById('btn-toggle-ar-gong');
+    if (btnToggleArGong) {
+        btnToggleArGong.addEventListener('click', () => {
+            toggleArGong();
+        });
+    }
+
     // Start requestAnimationFrame loop
     requestAnimationFrame(animationLoop);
 });
@@ -428,6 +450,10 @@ function playFailSound() {
 // Game Play Functions
 function startGame() {
     initAudio();
+
+    if (gongArActive) {
+        stopArGong();
+    }
 
     gameState = 'PLAYING';
     score = 0;
@@ -1028,7 +1054,7 @@ function startGestureControl() {
         });
 
         gestureTracker.setOptions({
-            maxNumHands: 1,
+            maxNumHands: 2,
             modelComplexity: 1,
             minDetectionConfidence: 0.5,
             minTrackingConfidence: 0.5
@@ -1110,6 +1136,11 @@ function stopGestureControl() {
 
 function onGestureResults(results) {
     if (!gestureActive) return;
+
+    if (gongArActive) {
+        renderArGong(results);
+        return;
+    }
 
     if (!gestureModelLoaded) {
         gestureModelLoaded = true;
@@ -1576,5 +1607,302 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// --- INTERACTIVE AR GONG STUDIO FUNCTIONS ---
+
+function toggleArGong() {
+    initAudio();
+    const btn = document.getElementById('btn-toggle-ar-gong');
+    const indicator = document.getElementById('ar-gong-indicator');
+    const loading = document.getElementById('gong-ar-loading');
+
+    if (!gongArActive) {
+        // Stop simulator game if active
+        if (isPlaying) {
+            stopGame();
+        }
+        
+        gongArActive = true;
+        gestureActive = true;
+
+        if (loading) {
+            loading.style.display = 'flex';
+            loading.style.opacity = '1';
+        }
+        
+        if (btn) {
+            btn.innerHTML = '🛑 Stop AR Gong';
+            btn.className = 'btn btn-secondary';
+        }
+        if (indicator) {
+            indicator.textContent = 'AR GONG ACTIVE';
+            indicator.className = 'gesture-indicator';
+        }
+
+        // Start MediaPipe hand tracking (shares same video element and tracker)
+        startGestureControl();
+    } else {
+        stopArGong();
+    }
+}
+
+function stopArGong() {
+    gongArActive = false;
+    const btn = document.getElementById('btn-toggle-ar-gong');
+    const indicator = document.getElementById('ar-gong-indicator');
+    
+    if (btn) {
+        btn.innerHTML = '🎥 Start AR Gong';
+        btn.className = 'btn btn-primary';
+    }
+    if (indicator) {
+        indicator.textContent = 'CAMERA INACTIVE';
+        indicator.className = 'gesture-indicator';
+    }
+
+    // Stop tracking
+    stopGestureControl();
+
+    // Clear AR Canvas
+    if (gongArCtx && gongArCanvas) {
+        gongArCtx.clearRect(0, 0, gongArCanvas.width, gongArCanvas.height);
+        // Draw inactive overlay text
+        gongArCtx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+        gongArCtx.font = "20px 'Outfit', sans-serif";
+        gongArCtx.textAlign = 'center';
+        gongArCtx.fillText("Camera Inactive. Click 'Start AR Gong' to play.", gongArCanvas.width / 2, gongArCanvas.height / 2);
+    }
+}
+
+// SYNTH: Premium brass gong sound (gong physical model blend)
+function playGongSound(fundamental) {
+    if (!audioCtx || isMuted) return;
+    
+    // Ensure AudioContext is running
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    
+    const now = audioCtx.currentTime;
+    
+    // Create master gain for gong strike
+    const masterGain = audioCtx.createGain();
+    masterGain.gain.setValueAtTime(0.45, now);
+    masterGain.gain.exponentialRampToValueAtTime(0.001, now + 2.5); // 2.5 second long decay
+    
+    // Lowpass filter with sweep for brass warming effect
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(1400, now);
+    filter.frequency.exponentialRampToValueAtTime(180, now + 1.2);
+    filter.Q.value = 2.5;
+    
+    // Mix 4 oscillators to create rich, inharmonic gong overtones
+    const ratios = [1.0, 1.48, 2.18, 2.85];
+    const gains = [0.65, 0.3, 0.2, 0.1];
+    
+    ratios.forEach((ratio, index) => {
+        const osc = audioCtx.createOscillator();
+        const oscGain = audioCtx.createGain();
+        
+        osc.type = index === 0 ? 'sine' : 'triangle';
+        osc.frequency.setValueAtTime(fundamental * ratio, now);
+        
+        // Pitch modulation wobble for metallic character
+        if (index > 0) {
+            osc.frequency.linearRampToValueAtTime(fundamental * ratio * 1.02, now + 0.06);
+            osc.frequency.linearRampToValueAtTime(fundamental * ratio * 0.98, now + 0.18);
+            osc.frequency.linearRampToValueAtTime(fundamental * ratio, now + 0.6);
+        }
+        
+        oscGain.gain.setValueAtTime(gains[index], now);
+        oscGain.gain.exponentialRampToValueAtTime(0.001, now + (2.5 - index * 0.5));
+        
+        osc.connect(oscGain);
+        oscGain.connect(filter);
+        
+        osc.start(now);
+        osc.stop(now + 2.6);
+    });
+    
+    filter.connect(masterGain);
+    masterGain.connect(audioCtx.destination);
+}
+
+function renderArGong(results) {
+    if (!gongArCanvas || !gongArCtx) return;
+
+    const w = gongArCanvas.width;
+    const h = gongArCanvas.height;
+
+    // Clear and draw video frame (mirrored visually)
+    gongArCtx.save();
+    gongArCtx.clearRect(0, 0, w, h);
+    gongArCtx.translate(w, 0);
+    gongArCtx.scale(-1, 1);
+    gongArCtx.drawImage(results.image, 0, 0, w, h);
+    gongArCtx.restore();
+
+    // Hide loading screen once first frame is received
+    const loading = document.getElementById('gong-ar-loading');
+    if (loading && loading.style.display !== 'none') {
+        loading.style.opacity = '0';
+        setTimeout(() => { if (loading) loading.style.display = 'none'; }, 300);
+    }
+
+    let activeGongId = null;
+    let handDetected = false;
+
+    // Check for hands
+    if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+        handDetected = true;
+        
+        // 1. Draw skeletons for all detected hands
+        results.multiHandLandmarks.forEach(landmarks => {
+            gongArCtx.save();
+            gongArCtx.translate(w, 0);
+            gongArCtx.scale(-1, 1);
+            drawHandSkeleton(gongArCtx, landmarks, w, h);
+            gongArCtx.restore();
+        });
+
+        // 2. Gather all finger tip coordinates across all hands
+        const activeFingers = [];
+        const tipIndices = [4, 8, 12, 16, 20]; // Thumb, Index, Middle, Ring, Pinky tips
+        
+        results.multiHandLandmarks.forEach((landmarks, handIdx) => {
+            tipIndices.forEach(tipId => {
+                const handX = 1.0 - landmarks[tipId].x; // mirror x
+                const handY = landmarks[tipId].y;
+                activeFingers.push({ x: handX, y: handY, id: `${handIdx}_${tipId}` });
+            });
+        });
+
+        // 3. Evaluate intersection of all fingers with each gong
+        virtualGongs.forEach(gong => {
+            const fingersInside = activeFingers.filter(finger => {
+                const dx = finger.x - gong.x;
+                const dy = finger.y - gong.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                return distance < gong.r;
+            }).map(finger => finger.id);
+
+            gong.previousFingers = gong.previousFingers || [];
+
+            // Detect new strikes (finger IDs inside now that weren't in previous frame)
+            let hasNewStrike = false;
+            fingersInside.forEach(fid => {
+                if (!gong.previousFingers.includes(fid)) {
+                    hasNewStrike = true;
+                }
+            });
+
+            if (hasNewStrike) {
+                gong.pulse = 1.0;
+                playGongSound(gong.freq);
+            }
+
+            gong.active = (fingersInside.length > 0);
+            gong.previousFingers = fingersInside;
+
+            if (gong.active) {
+                activeGongId = gong.id;
+            }
+        });
+    } else {
+        // No hands: reset all gongs
+        virtualGongs.forEach(gong => {
+            gong.active = false;
+            gong.previousFingers = [];
+        });
+    }
+
+    // Update status text indicator
+    const indicator = document.getElementById('ar-gong-indicator');
+    if (indicator) {
+        if (!handDetected) {
+            indicator.textContent = 'PLACE HANDS IN VIEW';
+            indicator.className = 'gesture-indicator';
+        } else if (activeGongId !== null) {
+            const activeGong = virtualGongs.find(g => g.id === activeGongId);
+            indicator.textContent = `💥 STRUCK: ${activeGong.name.toUpperCase()}`;
+            indicator.className = 'gesture-indicator detected-outside';
+        } else {
+            indicator.textContent = 'HAND DETECTED - STRIKE GONG';
+            indicator.className = 'gesture-indicator detected-inside';
+        }
+    }
+
+    // Draw Virtual Gongs overlay on top of mirrored feed
+    virtualGongs.forEach(gong => {
+        // Animate pulse decay
+        if (gong.pulse > 0) {
+            gong.pulse -= 0.08;
+            if (gong.pulse < 0) gong.pulse = 0;
+        }
+
+        const gongX = gong.x * w;
+        const gongY = gong.y * h;
+        const gongR = gong.r * w;
+
+        // 1. Draw Struck Glow Ripple
+        if (gong.pulse > 0) {
+            gongArCtx.beginPath();
+            gongArCtx.arc(gongX, gongY, gongR * (1.0 + gong.pulse * 0.4), 0, 2 * Math.PI);
+            gongArCtx.strokeStyle = gong.color;
+            gongArCtx.lineWidth = 6 * gong.pulse;
+            gongArCtx.stroke();
+        }
+
+        // 2. Draw Gong Outer Ring (Metallic border)
+        gongArCtx.beginPath();
+        gongArCtx.arc(gongX, gongY, gongR, 0, 2 * Math.PI);
+        const gradient = gongArCtx.createRadialGradient(gongX, gongY, gongR * 0.1, gongX, gongY, gongR);
+        gradient.addColorStop(0, '#f39c12'); // golden center
+        gradient.addColorStop(0.5, '#d35400'); // bronze mid
+        gradient.addColorStop(0.85, '#962d00'); // dark copper
+        gradient.addColorStop(1, '#2c1e18'); // metallic dark edge
+        
+        gongArCtx.fillStyle = gradient;
+        gongArCtx.strokeStyle = gong.active ? gong.color : '#f1c40f'; // glow color if active, gold if inactive
+        gongArCtx.lineWidth = gong.active ? 6 : 4;
+        gongArCtx.fill();
+        gongArCtx.stroke();
+
+        // 3. Draw Inner Ring
+        gongArCtx.beginPath();
+        gongArCtx.arc(gongX, gongY, gongR * 0.6, 0, 2 * Math.PI);
+        gongArCtx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+        gongArCtx.lineWidth = 2;
+        gongArCtx.stroke();
+
+        // 4. Draw Central Boss (the raised middle part of gong)
+        gongArCtx.beginPath();
+        gongArCtx.arc(gongX, gongY, gongR * 0.25, 0, 2 * Math.PI);
+        const bossGrad = gongArCtx.createRadialGradient(gongX - gongR*0.05, gongY - gongR*0.05, 0, gongX, gongY, gongR * 0.25);
+        bossGrad.addColorStop(0, '#ffeaa7'); // highlight
+        bossGrad.addColorStop(1, '#f1c40f'); // gold
+        gongArCtx.fillStyle = bossGrad;
+        gongArCtx.strokeStyle = '#d35400';
+        gongArCtx.lineWidth = 2;
+        gongArCtx.fill();
+        gongArCtx.stroke();
+
+        // 5. Draw Text Labels
+        gongArCtx.fillStyle = '#ffffff';
+        gongArCtx.font = "bold 15px 'Outfit', sans-serif";
+        gongArCtx.textAlign = 'center';
+        gongArCtx.textBaseline = 'middle';
+        gongArCtx.shadowColor = 'rgba(0,0,0,0.8)';
+        gongArCtx.shadowBlur = 6;
+        gongArCtx.fillText(gong.label, gongX, gongY);
+        
+        // Inactive shadows for title drawing
+        gongArCtx.shadowBlur = 0;
+        gongArCtx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        gongArCtx.font = "bold 13px 'Outfit', sans-serif";
+        gongArCtx.fillText(gong.name, gongX, gongY + gongR + 25);
+    });
+}
 
 
